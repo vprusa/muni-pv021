@@ -9,6 +9,7 @@
   <version>1.0-SNAPSHOT</version>
 
   <properties>
+		<version.plugin.checkstyle>2.17</version.plugin.checkstyle>
     <version.exec-maven-plugin>1.6.0</version.exec-maven-plugin>
   </properties>
 
@@ -22,6 +23,29 @@
           <mainClass>cz.muni.fi.pv021.Application</mainClass>
         </configuration>
       </plugin>
+
+      <plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-checkstyle-plugin</artifactId>
+							<version>${version.plugin.checkstyle}</version>
+							<executions>
+								<execution>
+									<id>validate</id>
+									<phase>validate</phase>
+									<configuration>
+										<configLocation>pb162_codestyle.xml</configLocation>
+										<encoding>UTF-8</encoding>
+										<consoleOutput>true</consoleOutput>
+										<failOnViolation>${checkstyle.failOnViolation}</failOnViolation>
+										<violationSeverity>warning</violationSeverity>
+										<includeTestSourceDirectory>false</includeTestSourceDirectory>
+									</configuration>
+									<goals>
+										<goal>check</goal>
+									</goals>
+								</execution>
+							</executions>
+						</plugin>
     </plugins>
   </build>
 
