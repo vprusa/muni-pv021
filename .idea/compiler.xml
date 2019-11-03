@@ -9,8 +9,8 @@
         <module name="muni-pv021-project" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="muni-pv021-project" target="1.5" />
+    <bytecodeTargetLevel target="8">
+      <module name="muni-pv021-project" target="8" />
     </bytecodeTargetLevel>
   </component>
 </project>
