@@ -63,7 +63,7 @@ public class DataReader {
         return labelPoints;
     }
 
-    public static LabelPoint[] readBatch(BufferedReader features, BufferedReader labels, int batchSize, LabelPoint[] labelPoints) throws IOException {
+    public static void readBatch(BufferedReader features, BufferedReader labels, int batchSize, LabelPoint[] labelPoints) throws IOException {
         String point = "";
         String label = "";
 
@@ -82,8 +82,6 @@ public class DataReader {
             }
 
         System.out.println("Read " + lineCount + " csv lines.");
-
-        return labelPoints;
     }
 
     public static void write(String file, int[] answers) throws FileNotFoundException {
