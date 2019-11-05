@@ -1,11 +1,13 @@
 package cz.muni.fi.pv021;
 
+import java.util.Arrays;
+
 public class LabelPoint {
 
     private int label;
-    private int features[];
+    private int[] features;
 
-    public LabelPoint (int label, int[] features) {
+    LabelPoint(int label, int[] features) {
         this.label = label;
         this.features = features;
     }
@@ -20,6 +22,6 @@ public class LabelPoint {
 
     @Override
     public String toString() {
-        return "Labeled point(" + " label = " + label + " )";
+        return "Labeled point: " + label + " - " + Arrays.toString(features);
     }
 }

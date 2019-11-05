@@ -2,12 +2,11 @@ package cz.muni.fi.pv021;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 
-public class DataReader {
+class DataReader {
 
-    final static int dataPerLine = 28 * 28;
+    private final static int dataPerLine = 28 * 28;
 
     /**
      * Old version of reader, probably removed in next revision
@@ -66,9 +65,9 @@ public class DataReader {
     /**
      * Tested and functional, reads batchSize lines from data and labels and puts it into labeled points.
      */
-    public static void readBatch(BufferedReader features, BufferedReader labels, int batchSize, LabelPoint[] labelPoints) {
-        String point = "";
-        String label = "";
+    static void readBatch(BufferedReader features, BufferedReader labels, int batchSize, LabelPoint[] labelPoints) {
+        String point;
+        String label;
         int lineCount = 0;
 
         try {
@@ -83,9 +82,7 @@ public class DataReader {
                 labelPoints[lineCount] = labelPoint;
                 lineCount++;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NumberFormatException e) {
+        } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
         }
     }
@@ -93,7 +90,7 @@ public class DataReader {
     /**
      * Tested and functional, writes array of ints into file.
      */
-    public static void write(String file, int[] answers) {
+    static void write(String file, int[] answers) {
         java.io.PrintWriter outfile = null;
 
         try {
@@ -103,11 +100,10 @@ public class DataReader {
             e.printStackTrace();
         }
 
-        for (int i = 0; i < answers.length; i++) {
-            outfile.println(answers[i]);
-        }
-
         assert outfile != null;
+        for (int answer : answers) {
+            outfile.println(answer);
+        }
         outfile.close();
     }
 }
