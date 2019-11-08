@@ -1,12 +1,15 @@
-package cz.muni.fi.pv021;
+package cz.muni.fi.pv021.utils;
+
+import cz.muni.fi.pv021.model.LabelPoint;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 
 class DataReader {
 
-    private final static int dataPerLine = 28 * 28;
+    private static final int dataPerLine = 28 * 28;
 
     /**
      * Old version of reader, probably removed in next revision
@@ -16,14 +19,17 @@ class DataReader {
         BufferedReader labels = null;
         String point = "";
         String label = "";
-        LabelPoint[] labelPoints = new LabelPoint[numberOfPoints]; //here we can have problems if the last iteration has fever points
+        //here we can have problems if the last iteration has fever points
+        LabelPoint[] labelPoints = new LabelPoint[numberOfPoints];
 
         int lineCount = 0;
 
         try {
             features = new BufferedReader(new FileReader(data));
             labels = new BufferedReader(new FileReader(dataLabel));
-            while ((point = features.readLine()) != null && (label = labels.readLine()) != null && lineCount < numberOfPoints) {
+            while ((point = features.readLine()) != null
+                    && (label = labels.readLine()) != null
+                    && lineCount < numberOfPoints) {
 
                 String[] lineValues = point.split(",");
                 int[] values = new int[dataPerLine];
@@ -71,7 +77,8 @@ class DataReader {
         int lineCount = 0;
 
         try {
-            while (lineCount < batchSize && (point = features.readLine()) != null && (label = labels.readLine()) != null) {
+            while (lineCount < batchSize && (point = features.readLine()) != null
+                    && (label = labels.readLine()) != null) {
                 String[] lineValues = point.split(",");
                 int[] values = new int[dataPerLine];
                 for (int i = 0; i < dataPerLine; i++) {

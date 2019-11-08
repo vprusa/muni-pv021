@@ -26,9 +26,9 @@
         </module> -->
         <!--TODO fix ... -->
         <!--<module name="WriteTag">-->
-            <!--<property name="tag" value="@author"/>-->
-       <!--     <property name="tagFormat" value="..* ..*"/>-->
-            <!-- What to do if the tag does not exists? -->
+        <!--<property name="tag" value="@author"/>-->
+        <!-- <property name="tagFormat" value="..* ..*"/>-->
+        <!-- What to do if the tag does not exists? -->
         <!--<property name="severity" value="error"/>-->
         <!-- What to do if the tag exists? -->
         <!--<property name="tagSeverity" value="ignore"/>-->
