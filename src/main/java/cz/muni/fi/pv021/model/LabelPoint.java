@@ -1,4 +1,4 @@
-package cz.muni.fi.pv021;
+package cz.muni.fi.pv021.model;
 
 import java.util.Arrays;
 
@@ -7,7 +7,7 @@ public class LabelPoint {
     private int label;
     private int[] features;
 
-    LabelPoint(int label, int[] features) {
+    public LabelPoint(int label, int[] features) {
         this.label = label;
         this.features = features;
     }
