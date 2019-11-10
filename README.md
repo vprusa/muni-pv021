@@ -36,3 +36,17 @@ equation/linear-program solvers, etc.
 8. What you do internally with the training dataset is up to you.
 9. Pack all data with your implementations and put them on the right path so
 your program will load them correctly on AISA (project dir. is fine).
+
+## Run with Maven
+
+```
+mvn clean install exec:java
+```
+
+```
+mvn exec:java
+```
+
+```
+mvn test
+```
