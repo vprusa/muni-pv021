@@ -2,6 +2,11 @@ package cz.muni.fi.pv021.model;
 
 import java.util.Arrays;
 
+/**
+ * 
+ * @author <a href="mailto:34507957+czFIRE@users.noreply.github.com">Patrik Kadlec</a>
+ *
+ * */
 public class LabelPoint {
 
     private int label;

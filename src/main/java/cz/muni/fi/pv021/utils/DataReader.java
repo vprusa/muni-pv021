@@ -7,6 +7,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+/**
+ *
+ * @author <a href="mailto:34507957+czFIRE@users.noreply.github.com">Patrik Kadlec</a>
+ *
+ */
 class DataReader {
 
     private static final int dataPerLine = 28 * 28;
