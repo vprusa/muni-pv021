@@ -4,93 +4,36 @@ import cz.muni.fi.pv021.model.LabelPoint;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
- *
- * @author <a href="mailto:34507957+czFIRE@users.noreply.github.com">Patrik Kadlec</a>
- *
+ * @author <a href="mailto:34507957+czFIRE@users.noreply.github.com">Petr Kadlec</a>
  */
-class DataReader {
 
-    private static final int dataPerLine = 28 * 28;
+public class DataReader {
 
-    /**
-     * Old version of reader, probably removed in next revision
-     */
-    public static LabelPoint[] readWhole(String data, String dataLabel, int numberOfPoints) throws IOException {
-        BufferedReader features = null;
-        BufferedReader labels = null;
-        String point = "";
-        String label = "";
-        //here we can have problems if the last iteration has fever points
-        LabelPoint[] labelPoints = new LabelPoint[numberOfPoints];
-
-        int lineCount = 0;
-
-        try {
-            features = new BufferedReader(new FileReader(data));
-            labels = new BufferedReader(new FileReader(dataLabel));
-            while ((point = features.readLine()) != null
-                    && (label = labels.readLine()) != null
-                    && lineCount < numberOfPoints) {
-
-                String[] lineValues = point.split(",");
-                int[] values = new int[dataPerLine];
-                for (int i = 0; i < dataPerLine; i++) {
-                    values[i] = Integer.parseInt(lineValues[i]);
-                }
-
-                LabelPoint labelPoint = new LabelPoint(Integer.parseInt(label), values);
-                labelPoints[lineCount] = labelPoint;
-                lineCount++;
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (features != null) {
-                try {
-                    features.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (label != null) {
-                try {
-                    features.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        System.out.println("Read " + lineCount + " lines.");
-
-        return labelPoints;
-    }
+    public static final int dataPerLine = 28 * 28;
+    public static final int dataClasses = 10;
 
     /**
-     * Tested and functional, reads batchSize lines from data and labels and puts it into labeled points.
+     * Reads batchSize lines from data and labels and puts it into labeled points.
      */
-    static void readBatch(BufferedReader features, BufferedReader labels, int batchSize, LabelPoint[] labelPoints) {
+    public static void readBatch(BufferedReader features,BufferedReader labels,int batchSize,LabelPoint[] labelPoints) {
         String point;
         String label;
         int lineCount = 0;
 
         try {
-            while (lineCount < batchSize && (point = features.readLine()) != null
-                    && (label = labels.readLine()) != null) {
+            while (lineCount<batchSize && (point=features.readLine()) != null && (label=labels.readLine()) != null) {
                 String[] lineValues = point.split(",");
-                int[] values = new int[dataPerLine];
+                int[][] values = new int[dataPerLine][1];
                 for (int i = 0; i < dataPerLine; i++) {
-                    values[i] = Integer.parseInt(lineValues[i]);
+                    values[i][0] = Integer.parseInt(lineValues[i]);
                 }
-
-                LabelPoint labelPoint = new LabelPoint(Integer.parseInt(label), values);
+                int[][] lab = new int[1][dataClasses];
+                lab[0][Integer.parseInt(label)] = 1;
+                LabelPoint labelPoint = new LabelPoint(lab, values);
                 labelPoints[lineCount] = labelPoint;
                 lineCount++;
             }
@@ -100,9 +43,10 @@ class DataReader {
     }
 
     /**
-     * Tested and functional, writes array of ints into file.
+     * TODO
+     * Writes array of ints into file.
      */
-    static void write(String file, int[] answers) {
+    public static void write(String file, int[][] answers) {
         java.io.PrintWriter outfile = null;
 
         try {
@@ -113,8 +57,8 @@ class DataReader {
         }
 
         assert outfile != null;
-        for (int answer : answers) {
-            outfile.println(answer);
+        for (int[] answer : answers) {  //change to max
+            outfile.println(Arrays.toString(answer));
         }
         outfile.close();
     }
