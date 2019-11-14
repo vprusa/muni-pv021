@@ -5,12 +5,15 @@ import cz.muni.fi.pv021.utils.Utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:34507957+czFIRE@users.noreply.github.com">Petr Kadlec</a>
  */
 
 public class Mlp {
+
+    static final Logger log = Logger.getLogger(Mlp.class.getSimpleName());
 
     private int layers;
     private int[] architecture;
@@ -108,11 +111,11 @@ public class Mlp {
 
     public void verbosePrint() {
         for (int i = 0; i < layers; i++) {
-            System.out.println("Layer " + (i+1) + ":");
-            System.out.println("Weights: " + Arrays.deepToString(weights.get(i)));
-            System.out.println("Biases: " + Arrays.deepToString(biases.get(i)));
-            System.out.println("Potentials: " + Arrays.deepToString(potentials.get(i)));
-            System.out.println("Activations: " + Arrays.deepToString(activations.get(i)));
+            log.info("Layer " + (i+1) + ":");
+            log.info("Weights: " + Arrays.deepToString(weights.get(i)));
+            log.info("Biases: " + Arrays.deepToString(biases.get(i)));
+            log.info("Potentials: " + Arrays.deepToString(potentials.get(i)));
+            log.info("Activations: " + Arrays.deepToString(activations.get(i)));
         }
     }
 
