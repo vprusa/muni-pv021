@@ -5,7 +5,6 @@ import java.util.Arrays;
 /**
  * @author <a href="mailto:34507957+czFIRE@users.noreply.github.com">Petr Kadlec</a>
  */
-
 public class LabelPoint {
 
     private int[][] label;

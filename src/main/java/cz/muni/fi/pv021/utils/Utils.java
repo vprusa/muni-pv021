@@ -32,7 +32,7 @@ public class Utils {
         return seed;
     }
 
-    public static double uniformDouble() {
+    public static Double uniformDouble() {
         return random.nextDouble() - 0.5;
     }
 
@@ -43,8 +43,8 @@ public class Utils {
         return random.nextInt(to);
     }
 
-    public static double[][] randomMat (int rows, int cols) {
-        double[][] mat = new double[rows][cols];
+    public static Double[][] randomMat (int rows, int cols) {
+        Double[][] mat = new Double[rows][cols];
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
@@ -55,10 +55,10 @@ public class Utils {
         return mat;
     }
 
-    public static double[][] transposeMat (double[][] matrix) {
+    public static Double[][] transposeMat (Double[][] matrix) {
         int rows = matrix.length;
         int cols = matrix[0].length;
-        double[][] mat = new double[cols][rows];
+        Double[][] mat = new Double[cols][rows];
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
@@ -69,21 +69,21 @@ public class Utils {
         return mat;
     }
 
-    public static double[][] transposeMat (int[][] matrix) {
+    public static Double[][] transposeMat (int[][] matrix) {
         int rows = matrix.length;
         int cols = matrix[0].length;
-        double[][] mat = new double[cols][rows];
+        Double[][] mat = new Double[cols][rows];
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                mat[j][i] = matrix[i][j];
+                mat[j][i] = Double.valueOf(matrix[i][j]);
             }
         }
 
         return mat;
     }
 
-    public static void addMats (double[][] mat1, double[][] mat2, double[][] mat) {
+    public static void addMats (Double[][] mat1, Double[][] mat2, Double[][] mat) {
         int rows = mat1.length;
         int cols = mat1[0].length;
 
@@ -95,7 +95,7 @@ public class Utils {
 
     }
 
-    public static void addConstantToMat (double num, double[][] matrix, double[][] mat) {
+    public static void addConstantToMat (Double num, Double[][] matrix, Double[][] mat) {
         int rows = matrix.length;
         int cols = matrix[0].length;
 
@@ -107,7 +107,7 @@ public class Utils {
 
     }
 
-    public static void subtractMats (double[][] mat1, double[][] mat2, double[][] mat) {
+    public static void subtractMats (Double[][] mat1, Double[][] mat2, Double[][] mat) {
         int rows = mat1.length;
         int cols = mat1[0].length;
 
@@ -119,7 +119,7 @@ public class Utils {
 
     }
 
-    public static void subtractMats (double[][] mat1, int[][] mat2, double[][] mat) {
+    public static void subtractMats (Double[][] mat1, int[][] mat2, Double[][] mat) {
         int rows = mat1.length;
         int cols = mat1[0].length;
 
@@ -131,7 +131,7 @@ public class Utils {
 
     }
 
-    public static double[][] elementWiseMultiplication (double[][] mat1, double[][] mat2) {
+    public static Double[][] elementWiseMultiplication (Double[][] mat1, Double[][] mat2) {
         int rows = mat1.length;
         int cols = mat1[0].length;
 
@@ -139,7 +139,7 @@ public class Utils {
             throw new RuntimeException("Invalid dimensions in elementWiseMultiplication");
         }
 
-        double[][] mat = new double[rows][cols];
+        Double[][] mat = new Double[rows][cols];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 mat[i][j] = mat1[i][j] * mat2[i][j];
@@ -149,11 +149,11 @@ public class Utils {
         return mat;
     }
 
-    public static double[][] multiplyMatByConstant (double num, double[][] matrix) {
+    public static Double[][] multiplyMatByConstant (Double num, Double[][] matrix) {
         int rows = matrix.length;
         int cols = matrix[0].length;
 
-        double[][] mat = new double[rows][cols];
+        Double[][] mat = new Double[rows][cols];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 mat[i][j] = matrix[i][j] * num;
@@ -162,7 +162,7 @@ public class Utils {
         return mat;
     }
 
-    public static void matrixMultiplication (double[][] mat1, double[][] mat2, double[][] mat) {
+    public static void matrixMultiplication (Double[][] mat1, Double[][] mat2, Double[][] mat) {
         int cols1 = mat1[0].length;
         int rows2 = mat2.length;
 
@@ -183,7 +183,7 @@ public class Utils {
 
     }
 
-    public static void matrixMultiplication (double[][] mat1, int[][] mat2, double[][] mat) {
+    public static void matrixMultiplication (Double[][] mat1, int[][] mat2, Double[][] mat) {
         int cols1 = mat1[0].length;
         int rows2 = mat2.length;
 
@@ -204,19 +204,19 @@ public class Utils {
 
     }
 
-    public static void softmax (double[][] matrix, double[][] mat) {
+    public static void softmax (Double[][] matrix, Double[][] mat) {
         int rows = matrix.length;
         int cols = matrix[0].length;
-        double sum = 0.0d;
-        double offset = 0.0d;
+        Double sum = 0.0d;
+        Double offset = 0.0d;
 
-        for (double[] matrixR: matrix) {
+        for (Double[] matrixR: matrix) {
             for (int i = 0; i < cols; i++) {
                 if (offset < matrixR[i]) offset = matrixR[i];
             }
         }
 
-        for (double[] matrixR: matrix) {
+        for (Double[] matrixR: matrix) {
             for (int i = 0; i < cols; i++) {
                 sum += Math.exp(matrixR[i] - offset);
             }
@@ -230,7 +230,7 @@ public class Utils {
 
     }
 
-    public static void sigmoid (double[][] matrix, double[][] mat) {
+    public static void sigmoid (Double[][] matrix, Double[][] mat) {
         int rows = matrix.length;
         int cols = matrix[0].length;
 
@@ -242,11 +242,11 @@ public class Utils {
 
     }
 
-    public static double[][] sigmoidDerivative (double[][] activated) {
+    public static Double[][] sigmoidDerivative (Double[][] activated) {
         int rows = activated.length;
         int cols = activated[0].length;
 
-        double[][] mat = new double[rows][cols];
+        Double[][] mat = new Double[rows][cols];
         subtractMats(activated, elementWiseMultiplication(activated, activated), mat);
         return mat;
     }

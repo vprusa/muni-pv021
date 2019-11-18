@@ -6,4 +6,9 @@ package cz.muni.fi.pv021.logic;
  * @author <a href="mailto:34507957+czFIRE@users.noreply.github.com">Petr Kadlec</a>
  */
 public class NeuralNetwork {
+    public void train() {
+    }
+
+    public void recognize() {
+    }
 }

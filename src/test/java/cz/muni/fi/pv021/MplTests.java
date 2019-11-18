@@ -23,8 +23,8 @@ public class MplTests extends TestBase {
         int [][] inputs = new int[][] {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
         int [][] labels = new int[][] {{0,1}, {1,0}, {1,0}, {0,1}};
 
-        mlp.weights.set(0, new double[][] {{0.1740005435138374, 0.0801473866250636}, {0.3270837708332951, -0.10848856950394965}, {0.16117188643209557, 0.28524559364335067}});
-        mlp.weights.set(1, new double[][] {{-0.041032159382172965, -0.07241668329088848, -0.15394665100235375}, {-0.24672326927202676, -0.09858066687762419, 0.06791824844738917}});
+        mlp.weights.set(0, new Double[][] {{0.1740005435138374, 0.0801473866250636}, {0.3270837708332951, -0.10848856950394965}, {0.16117188643209557, 0.28524559364335067}});
+        mlp.weights.set(1, new Double[][] {{-0.041032159382172965, -0.07241668329088848, -0.15394665100235375}, {-0.24672326927202676, -0.09858066687762419, 0.06791824844738917}});
         log.info(Arrays.deepToString(mlp.weights.get(0)) + Arrays.deepToString(mlp.weights.get(1)));
         for (int i = 0; i < 10000; i++) {
             for (int j = 0; j < 4; j++) {
@@ -51,8 +51,8 @@ public class MplTests extends TestBase {
     @Test
     public void evaluateTest() {
         Mlp mlp = new Mlp(new int[] {2,2,2}, 0.1);
-        mlp.weights.set(0, new double[][] {{0.1, 0.3}, {0.2, 0.4}});
-        mlp.weights.set(1, new double[][] {{0.1, 0.3}, {0.2, 0.4}});
+        mlp.weights.set(0, new Double[][] {{0.1, 0.3}, {0.2, 0.4}});
+        mlp.weights.set(1, new Double[][] {{0.1, 0.3}, {0.2, 0.4}});
         assertNotNull(mlp.weights.get(0));
         assertNotNull(mlp.weights.get(1));
         log.info(Arrays.deepToString(mlp.weights.get(0)) + Arrays.deepToString(mlp.weights.get(1)));

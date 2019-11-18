@@ -1,5 +1,6 @@
-package cz.muni.fi.pv021.model;
+package cz.muni.fi.pv021.visualization;
 
+import cz.muni.fi.pv021.model.Mlp;
 import cz.muni.fi.pv021.utils.Utils;
 
 import java.util.ArrayList;
@@ -12,8 +13,7 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:34507957+czFIRE@users.noreply.github.com">Petr Kadlec</a>
  */
-public class Mlp {
-
+public class MlpVis {
     static final Logger log = Logger.getLogger(Mlp.class.getSimpleName());
 
     public int layers;
@@ -30,7 +30,19 @@ public class Mlp {
     public List<Double[][]> diffWeights;
     public List<Double[][]> diffBiases;
 
-    public Mlp(int[] architecture, Double learningRate) {
+    public List<Neuron[][]> neurons = new ArrayList<Neuron[][]>();
+
+    public Double[][] initMatrix(int cols, int rows){
+        Double[][] arr = new Double[cols][rows];
+        for(int x = 0; x <cols;x++){
+            for(int y = 0; y <rows;y++){
+                arr[x][y] = new Double(0.0);
+            }
+        }
+        return arr;
+    }
+
+    public MlpVis(int[] architecture, Double learningRate) {
         this.layers = architecture.length - 1;
         this.architecture = architecture;
         this.learningRate = learningRate;
@@ -43,10 +55,20 @@ public class Mlp {
         for (int i = 1; i <= layers; i++) {
             Double[][] mat = Utils.randomMat(architecture[i], architecture[i-1]);
             mat = Utils.multiplyMatByConstant(Math.sqrt(1d/architecture[i-1]), mat);
-            this.weights.add(mat);   //can be improved for better initialization
-            this.biases.add(new Double[architecture[i]][1]);
-            this.activations.add(new Double[architecture[i]][1]);
-            this.potentials.add(new Double[architecture[i]][1]);
+            this.weights.add(mat); //can be improved for better initialization
+            this.biases.add(initMatrix(architecture[i],1));
+            this.activations.add(initMatrix(architecture[i],1));
+            this.potentials.add(initMatrix(architecture[i],1));
+
+            Neuron[][] nArr = new Neuron[architecture[i]][1];
+            for(int layer = 0; layer< nArr.length; layer++){
+                for(int col = 0; col< nArr[layer].length; col++){
+                    Neuron n = new Neuron(layer,i);
+                    n.bias = this.biases.get(i-1)[layer][0];
+                    nArr[layer][col] = n;
+                }
+            }
+            this.neurons.add(nArr);
         }
     }
 
@@ -74,21 +96,21 @@ public class Mlp {
     }
 
     public void layer3BackProp(int[][] inputLayer, int[][] label, int batchSize) { //label must be a matrix 1*10 matrix
-        Double[][] errorOutLayer = new Double[architecture[layers]][1]; //edited
+        Double[][] errorOutLayer = initMatrix(architecture[layers],1); //edited
         Utils.subtractMats(activations.get(layers - 1), label, errorOutLayer);
 
-        Double[][] dWeights2 = new Double[architecture[layers]][architecture[layers-1]];
+        Double[][] dWeights2 = initMatrix(architecture[layers],architecture[layers-1]);
         Utils.matrixMultiplication(errorOutLayer, Utils.transposeMat(activations.get(layers - 2)), dWeights2);
         dWeights2 = Utils.multiplyMatByConstant(1d/batchSize, dWeights2);
 
         Double[][] dBiases2 = Utils.multiplyMatByConstant(1d/batchSize, errorOutLayer);
 
-        Double[][] dActivations1 = new Double[architecture[layers-1]][1];    //edited second arg
+        Double[][] dActivations1 = initMatrix(architecture[layers-1],1);    //edited second arg
         Utils.matrixMultiplication(Utils.transposeMat(weights.get(layers-1)), errorOutLayer, dActivations1);
         Double[][] dPotentials1 = Utils.elementWiseMultiplication(dActivations1,
                 Utils.sigmoidDerivative(activations.get(layers-2)));
 
-        Double[][] dWeights1 = new Double[architecture[layers-1]][architecture[layers-2]];
+        Double[][] dWeights1 = initMatrix(architecture[layers-1],architecture[layers-2]);
         Utils.matrixMultiplication(dPotentials1, Utils.transposeMat(inputLayer), dWeights1);
         dWeights1 = Utils.multiplyMatByConstant(1d/batchSize, dWeights1);
 
@@ -111,13 +133,15 @@ public class Mlp {
     }
 
     public void verbosePrint() {
+        String msg = "";
         for (int i = 0; i < layers; i++) {
-            log.info("Layer " + (i+1) + ":");
-            log.info("Weights: " + Arrays.deepToString(weights.get(i)));
-            log.info("Biases: " + Arrays.deepToString(biases.get(i)));
-            log.info("Potentials: " + Arrays.deepToString(potentials.get(i)));
-            log.info("Activations: " + Arrays.deepToString(activations.get(i)));
+            msg += "Layer " + (i+1) + ":" + "\n";
+            msg += "Weights: " + Arrays.deepToString(weights.get(i)) + "\n";
+            msg += "Biases: " + Arrays.deepToString(biases.get(i)) + "\n";
+            msg += "Potentials: " + Arrays.deepToString(potentials.get(i)) + "\n";
+            msg += "Activations: " + Arrays.deepToString(activations.get(i)) + "\n";
         }
+        log.info(msg);
     }
 
 }
