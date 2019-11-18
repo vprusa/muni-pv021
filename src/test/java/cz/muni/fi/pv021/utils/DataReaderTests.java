@@ -68,7 +68,7 @@ public class DataReaderTests extends TestBase {
     @Test
     public void printerTest() {
         String file = TEST_DIR_OUT + "test_print.csv";
-        int[][] answers =  new int[][] {{1,2}, {1, 2, 3}};
+        double[][][] answers =  new double[][][] {{{1,2}, {1, 2, 3}}};
         DataReader.write(file, answers);
     }
 
