@@ -3,9 +3,6 @@ package cz.muni.fi.pv021;
 import cz.muni.fi.pv021.logic.NeuralNetwork;
 import cz.muni.fi.pv021.logic.NeuralNetworkFactory;
 import cz.muni.fi.pv021.model.Settings;
-import cz.muni.fi.pv021.utils.Utils;
-
-import java.util.logging.Logger;
 
 /**
  * Run with
@@ -17,7 +14,6 @@ public class Application {
 
     public static void main(String[] args){
         Settings settings = new Settings();
-
         NeuralNetwork nn = NeuralNetworkFactory.create(settings);
         nn.learn();
         nn.recognize();

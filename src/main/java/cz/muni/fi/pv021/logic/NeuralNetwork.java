@@ -44,11 +44,11 @@ public class NeuralNetwork {
         assert tLabels != null;
 
         int [][][] batches
-                = new int[Utils.dataSetLength/settings.miniBatchSize][DataReader.dataPerLine][settings.miniBatchSize];
+                = new int[Utils.dataSetLength/settings.miniBatchSize][settings.dataPerLine][settings.miniBatchSize];
         int [][][] labels
-                = new int[Utils.dataSetLength/settings.miniBatchSize][DataReader.dataClasses][settings.miniBatchSize];
+                = new int[Utils.dataSetLength/settings.miniBatchSize][settings.dataClasses][settings.miniBatchSize];
 
-        DataReader.readData(tData, batches, DataReader.dataPerLine, settings.miniBatchSize, Utils.dataSetLength);
+        DataReader.readData(tData, batches, settings.dataPerLine, settings.miniBatchSize, Utils.dataSetLength);
         DataReader.readData(tLabels, labels, 1, settings.miniBatchSize, Utils.dataSetLength);
 
         for (int epoch = 0; epoch < settings.epochs; epoch++) {
@@ -71,11 +71,11 @@ public class NeuralNetwork {
         assert control != null;
 
         int [][][] controlTest
-                = new int[Utils.testSetLength/settings.miniBatchSize][DataReader.dataPerLine][settings.miniBatchSize];
-        DataReader.readData(control, controlTest, DataReader.dataPerLine, settings.miniBatchSize, Utils.testSetLength);
+                = new int[Utils.testSetLength/settings.miniBatchSize][settings.dataPerLine][settings.miniBatchSize];
+        DataReader.readData(control, controlTest, settings.dataPerLine, settings.miniBatchSize, Utils.testSetLength);
 
         double [][][] answers = new double
-                [Utils.testSetLength/settings.miniBatchSize][settings.miniBatchSize][DataReader.dataClasses];
+                [Utils.testSetLength/settings.miniBatchSize][settings.miniBatchSize][settings.dataClasses];
         for (int i = 0; i < Utils.testSetLength/settings.miniBatchSize; i++) {
             mlp.evaluate(controlTest[i]);
             answers[i] = Utils.transposeMat(mlp.activations.get(1));

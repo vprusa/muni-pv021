@@ -57,6 +57,12 @@ public class Settings {
     @Parameter(names = "-seed")
     public static int seed = 138;
 
+    @Parameter(names = "-dataPerLine")
+    public static int dataPerLine = 28 * 28;
+
+    @Parameter(names = "-dataClasses")
+    public static int dataClasses = 10;
+
     public Settings() {}
 
     public Settings(int[] architecture, double learningRate, int miniBatchSize, double momentum) {
@@ -69,7 +75,7 @@ public class Settings {
     /*
     public Settings(int[] architecture, double learningRate, int miniBatchSize, double momentum, int epochs, int seed,
                     String resourcesDir, String answers, String trainData, String trainLabels, String testData,
-                    String testLabels) {
+                    String testLabels, int dataPerLine, int dataClasses) {
         this(architecture, learningRate, miniBatchSize, momentum);
         this.epochs = epochs;
         this.resourcesDir = resourcesDir;
@@ -79,6 +85,8 @@ public class Settings {
         this.trainLabels = trainLabels;
         this.testData = testData;
         this.testLabels = testLabels;
+        this.dataPerLine = dataPerLine;
+        this.dataClasses = dataClasses;
     }
     */
 

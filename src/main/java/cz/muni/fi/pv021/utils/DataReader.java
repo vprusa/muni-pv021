@@ -10,13 +10,9 @@ import java.io.IOException;
 
 public class DataReader {
 
-    public static final int dataPerLine = 28 * 28;
-    public static final int dataClasses = 10;
-
     public static void readData (BufferedReader data, int[][][] features, int featuresPerLine, int batchSize,
                                  int fileLength) {
         String number;
-        int lineCount;
 
         try {
             for (int i = 0; i < fileLength/batchSize; i++) {
