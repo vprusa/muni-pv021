@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class DataReader {
 
-    public static void readData (BufferedReader data, int[][][] features, int featuresPerLine, int batchSize,
+    public static void readData(BufferedReader data, int[][][] features, int featuresPerLine, int batchSize,
                                  int fileLength) {
         String number;
 

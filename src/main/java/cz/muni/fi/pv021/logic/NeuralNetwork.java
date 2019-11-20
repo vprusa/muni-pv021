@@ -30,11 +30,11 @@ public class NeuralNetwork {
         this.mlp = new MLP(this.settings);
     }
 
-    public void learn() {
+    public void learning() {
         log.info("Start learning");
         try {
-            tData = new BufferedReader(new FileReader(settings.trainData));
-            tLabels = new BufferedReader(new FileReader(settings.trainLabels));
+            tData = new BufferedReader(new FileReader(settings.resourcesDir + settings.trainData));
+            tLabels = new BufferedReader(new FileReader(settings.resourcesDir + settings.trainLabels));
         } catch (IOException e) {
             e.printStackTrace();
             return;
@@ -60,10 +60,10 @@ public class NeuralNetwork {
         log.info("Done learning");
     }
 
-    public void recognize() {
+    public void recognizing() {
         log.info("Start recognizing");
         try {
-            control = new BufferedReader(new FileReader(settings.testData));
+            control = new BufferedReader(new FileReader(settings.resourcesDir + settings.testData));
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -13,10 +13,10 @@ import cz.muni.fi.pv021.model.Settings;
 public class Application {
 
     public static void main(String[] args){
-        Settings settings = new Settings();
+        Settings settings = new Settings(args);
         NeuralNetwork nn = NeuralNetworkFactory.create(settings);
-        nn.learn();
-        nn.recognize();
+        nn.learning();
+        nn.recognizing();
     }
 
 }
