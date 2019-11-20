@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+THIS_DIR=$(dirname `realpath "$0"`)
+cd ${THIS_DIR}
+unzip -u *.zip # &&  sed -i 's/\r//g' *.csv
+NOW_FILE_NAME=`date +%Y-%m-%d_%H-%M-%S`
+RESULTS_DIR_NAME=evaluator
+RESULTS_DIR=${THIS_DIR}/${RESULTS_DIR_NAME}
+SOON_OLD_RESULTS_DIR_NAME=${THIS_DIR}/${RESULTS_DIR_NAME}_${NOW_FILE_NAME}
+[ -d ${RESULTS_DIR} ] && mv ${RESULTS_DIR} ${SOON_OLD_RESULTS_DIR_NAME}
+mkdir -p ${RESULTS_DIR}
+JAR_NAME=program.jar
+JAR_FILE=${THIS_DIR}/${JAR_NAME}
+rm -f ${JAR_FILE}
+SRC_DIR=${THIS_DIR}/src/main/java/
+TARGET_DIR=${THIS_DIR}/target/
+rm -rf ${TARGET_DIR}
+mkdir -p ${TARGET_DIR}
+find ${SRC_DIR} -name '*.class' | rm -f
+find ${SRC_DIR} -name '*.java' | xargs javac -d ${TARGET_DIR}
+jar cvf ${JAR_FILE} -C ${TARGET_DIR} .
+java -cp ${JAR_FILE} cz.muni.fi.pv021.Application

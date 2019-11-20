@@ -1,6 +1,6 @@
 package cz.muni.fi.pv021.logic;
 
-import cz.muni.fi.pv021.utils.Settings;
+import cz.muni.fi.pv021.model.Settings;
 
 /**
  * This is a factory for neural networks
@@ -9,8 +9,8 @@ import cz.muni.fi.pv021.utils.Settings;
  */
 public class NeuralNetworkFactory {
 
-    public static NeuralNetwork create(Settings criteria) {
-        NeuralNetwork nn = new NeuralNetwork();
+    public static NeuralNetwork create(Settings settings) {
+        NeuralNetwork nn = new NeuralNetwork(settings);
         return nn;
     }
 
