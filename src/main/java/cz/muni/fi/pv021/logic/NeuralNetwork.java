@@ -56,12 +56,22 @@ public class NeuralNetwork {
                 mlp.evaluateAndBackProp(batches[i], labels[i]);
                 if (i % 10 == 0) log.info("epoch: " + (epoch + 1) + " iteration: " + i);
             }
+            //learning rate is adaptive and updated after each epoch
+            Settings.setLearningRate(Settings.learningRate/Math.sqrt(epoch + 1));
         }
         log.info("Done learning");
+
+        double [][][] testLabelsCheck = new double [Utils.dataSetLength/settings.miniBatchSize][][];
+        for (int i = 0; i < Utils.dataSetLength/settings.miniBatchSize; i++) {
+            mlp.evaluate(batches[i]);
+            testLabelsCheck[i] = Utils.transposeMat(mlp.activations.get(1));
+        }
+        DataReader.write(settings.trainPredictions, testLabelsCheck);
     }
 
     public void recognizing() {
         log.info("Start recognizing");
+
         try {
             control = new BufferedReader(new FileReader(settings.resourcesDir + settings.testData));
         } catch (IOException e) {
@@ -75,7 +85,7 @@ public class NeuralNetwork {
         DataReader.readData(control, controlTest, settings.dataPerLine, settings.miniBatchSize, Utils.testSetLength);
 
         double [][][] answers = new double
-                [Utils.testSetLength/settings.miniBatchSize][settings.miniBatchSize][settings.dataClasses];
+                [Utils.testSetLength/settings.miniBatchSize][][];
         for (int i = 0; i < Utils.testSetLength/settings.miniBatchSize; i++) {
             mlp.evaluate(controlTest[i]);
             answers[i] = Utils.transposeMat(mlp.activations.get(1));
