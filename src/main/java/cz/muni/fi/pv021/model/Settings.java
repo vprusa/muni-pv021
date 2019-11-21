@@ -51,6 +51,8 @@ public class Settings {
                     case "seed":
                         this.seed = Integer.parseInt(a.replace(argNameFull,""));
                         break;
+                    case "trainPredictions":
+                        this.trainPredictions = a.replace(argNameFull, "");
                     case "answers":
                         this.answers = a.replace(argNameFull,"");
                         break;
@@ -113,6 +115,9 @@ public class Settings {
     // results a.k.a answers
     public static String answers = "evaluator/actualTestPredictions";
 
+    // results on train test
+    public static String trainPredictions = "evaluator/trainPredictions";
+
     /* Data provided to us by the teacher */
     public static String trainData = "mnist_train_vectors.csv";
 
@@ -147,4 +152,7 @@ public class Settings {
         log.info(msg.toString());
     }
 
+    public static void setLearningRate(double learningRate) {
+        Settings.learningRate = learningRate;
+    }
 }

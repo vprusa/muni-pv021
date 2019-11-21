@@ -205,4 +205,8 @@ public class MLP {
         evaluate(batch);
         momentumLayer3BackProp(batch, label);
     }
+
+    public Settings getSettings() {
+        return settings;
+    }
 }
