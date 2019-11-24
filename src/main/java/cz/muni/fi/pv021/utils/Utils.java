@@ -1,6 +1,10 @@
 package cz.muni.fi.pv021.utils;
 
+import java.util.Arrays;
 import java.util.Random;
+import java.util.function.UnaryOperator;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 /**
  * @author <a href="mailto:34507957+czFIRE@users.noreply.github.com">Petr Kadlec</a>
@@ -45,17 +49,17 @@ public class Utils {
 
     public static double[][] randomMat (int rows, int cols) {
         double[][] mat = new double[rows][cols];
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                mat[i][j] = uniformDouble(); //initialise close to zero
-            }
-        }
+        IntStream.range(0, rows).parallel().forEach(i ->
+            IntStream.range(0, cols).parallel().forEach(j ->{
+                mat[i][j] = uniformDouble();;
+            }));
 
         return mat;
     }
 
-    public static double[][] transposeMat (double[][] matrix) {
+    public static double[][] transposeMat(double[][] matrix) {
+        return transposeDouble().apply(matrix);
+        /*
         int rows = matrix.length;
         int cols = matrix[0].length;
         double[][] mat = new double[cols][rows];
@@ -65,92 +69,108 @@ public class Utils {
                 mat[j][i] = matrix[i][j];
             }
         }
-
         return mat;
+        */
     }
 
+    public static UnaryOperator<double[][]> transposeDouble() {
+        return m -> {
+            return java.util.stream.LongStream.range(0, m[0].length).parallel().mapToObj(r ->
+                    java.util.stream.LongStream.range(0, m.length).parallel().mapToDouble(c -> m[(int) c][(int) r]).toArray()
+            ).toArray(double[][]::new);
+        };
+    }
+
+
+
     public static int[][] transposeMat (int[][] matrix) {
+        return transposeInt().apply(matrix);
+        /*
         int rows = matrix.length;
         int cols = matrix[0].length;
         int[][] mat = new int[cols][rows];
-
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 mat[j][i] = matrix[i][j];
             }
         }
-
         return mat;
+        */
+    }
+
+    public static UnaryOperator<int[][]> transposeInt() {
+        return m -> {
+            return java.util.stream.IntStream.range(0, m[0].length).parallel().mapToObj(r ->
+                    java.util.stream.IntStream.range(0, m.length).parallel().map(c -> m[c][r]).toArray()
+            ).toArray(int[][]::new);
+        };
     }
 
     public static void addMats (double[][] mat1, double[][] mat2, double[][] mat) {
         int rows = mat1.length;
         int cols = mat1[0].length;
 
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
+        IntStream.range(0, rows).parallel().forEach(i ->
+            IntStream.range(0, cols).parallel().forEach(j ->{
                 mat[i][j] = mat1[i][j] + mat2[i][j];
-            }
-        }
-
+            }));
     }
 
     public static void addConstantToMat (double num, double[][] matrix, double[][] mat) {
         int rows = matrix.length;
         int cols = matrix[0].length;
 
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
+        IntStream.range(0, rows).parallel().forEach(i ->
+            IntStream.range(0, cols).parallel().forEach(j ->{
                 mat[i][j] = matrix[i][j] + num;
-            }
-        }
-
+            }));
     }
 
     public static void meanColumn (double[][] matrix, double[][] mat) {
         int rows = matrix.length;
         int cols = matrix[0].length;
 
-        for (int i = 0; i < rows; i++) {
+        IntStream.range(0, rows).parallel().forEach(i -> {
             mat[i][0] = 0;
-            for (int j = 0; j < cols; j++) {
+            IntStream.range(0, cols).forEach(j ->{
                 mat[i][0] += matrix[i][j];
-            }
+            });
             mat[i][0] /= cols;
-        }
+        });
     }
 
     public static void addVectorToMat (double[][] mat1, double[][] vec, double[][] mat) {
         int rows = mat1.length;
         int cols = mat1[0].length;
 
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
+
+        IntStream.range(0, rows).parallel().forEach(i -> {
+            IntStream.range(0, cols).parallel().forEach(j ->{
                 mat[i][j] = mat1[i][j] + vec[i][0];
-            }
-        }
+            });
+        });
     }
 
     public static void subtractMats (double[][] mat1, double[][] mat2, double[][] mat) {
         int rows = mat1.length;
         int cols = mat1[0].length;
 
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
+        IntStream.range(0, rows).parallel().forEach(i -> {
+            IntStream.range(0, cols).parallel().forEach(j ->{
                 mat[i][j] = mat1[i][j] - mat2[i][j];
-            }
-        }
+            });
+        });
     }
 
     public static void subtractMats (double[][] mat1, int[][] mat2, double[][] mat) {
         int rows = mat1.length;
         int cols = mat1[0].length;
 
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
+        IntStream.range(0, rows).parallel().forEach(i -> {
+            IntStream.range(0, cols).parallel().forEach(j ->{
                 mat[i][j] = mat1[i][j] - mat2[i][j];
-            }
-        }
+            });
+        });
     }
 
     public static double[][] elementWiseMultiplicationNew (double[][] mat1, double[][] mat2) {
@@ -162,11 +182,11 @@ public class Utils {
         }
 
         double[][] mat = new double[rows][cols];
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
+        IntStream.range(0, rows).parallel().forEach(i -> {
+            IntStream.range(0, cols).parallel().forEach(j ->{
                 mat[i][j] = mat1[i][j] * mat2[i][j];
-            }
-        }
+            });
+        });
         return mat;
     }
 
@@ -178,11 +198,11 @@ public class Utils {
             throw new RuntimeException("Invalid dimensions in elementWiseMultiplication");
         }
 
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
+        IntStream.range(0, rows).parallel().forEach(i -> {
+            IntStream.range(0, cols).parallel().forEach(j ->{
                 mat1[i][j] *= mat2[i][j];
-            }
-        }
+            });
+        });
     }
 
     public static double[][] multiplyMatByConstantNew (double num, double[][] matrix) {
@@ -190,11 +210,12 @@ public class Utils {
         int cols = matrix[0].length;
 
         double[][] mat = new double[rows][cols];
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
+
+        IntStream.range(0, rows).parallel().forEach(i -> {
+            IntStream.range(0, cols).parallel().forEach(j ->{
                 mat[i][j] = matrix[i][j] * num;
-            }
-        }
+            });
+        });
         return mat;
     }
 
@@ -202,11 +223,10 @@ public class Utils {
         int rows = matrix.length;
         int cols = matrix[0].length;
 
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
+        IntStream.range(0, rows).parallel().forEach(i ->
+            IntStream.range(0, cols).forEach(j ->{
                 matrix[i][j] *= num;
-            }
-        }
+            }));
     }
 
     public static void matrixMultiplication (double[][] mat1, double[][] mat2, double[][] mat) {
@@ -220,14 +240,14 @@ public class Utils {
         int rows1 = mat1.length;
         int cols2 = mat2[0].length;
 
-        for (int i = 0; i < rows1; i++) {
-            for (int j = 0; j < cols2; j++) {
+        IntStream.range(0, rows1).parallel().forEach(i ->
+            IntStream.range(0, cols2).parallel().forEach(j ->{
                 mat[i][j] = 0;
-                for (int k = 0; k < cols1; k++) {
-                    mat[i][j] += mat1[i][k] * mat2[k][j];
-                }
-            }
-        }
+                IntStream.range(0, cols1).forEach(k -> {
+                        mat[i][j] += (mat1[i][k] * mat2[k][j]);
+                    }
+                );
+            }));
     }
 
     public static void matrixMultiplication (double[][] mat1, int[][] mat2, double[][] mat) {
@@ -241,14 +261,14 @@ public class Utils {
         int rows1 = mat1.length;
         int cols2 = mat2[0].length;
 
-        for (int i = 0; i < rows1; i++) {
-            for (int j = 0; j < cols2; j++) {
+        IntStream.range(0, rows1).parallel().forEach(i ->
+            IntStream.range(0, cols2).parallel().forEach(j ->{
                 mat[i][j] = 0;
-                for (int k = 0; k < cols1; k++) {
-                    mat[i][j] += mat1[i][k] * mat2[k][j];
-                }
-            }
-        }
+                IntStream.range(0, cols1).forEach(k -> {
+                        mat[i][j] += (mat1[i][k] * mat2[k][j]);
+                    }
+                );
+            }));
     }
 
     public static void softmax (double[][] matrix, double[][] mat) {
@@ -269,10 +289,10 @@ public class Utils {
             }
 
             for (int i = 0; i < rows; i++) {
-                /*if (Double.isInfinite(Math.exp(matrix[i][j] - offset)) && Double.isInfinite(sum)) {
-                    mat[i][j] = 1;
-                    continue;
-                }*/
+                //if (Double.isInfinite(Math.exp(matrix[i][j] - offset)) && Double.isInfinite(sum)) {
+                //    mat[i][j] = 1;
+                //    continue;
+                //}
                 mat[i][j] = Math.exp(matrix[i][j] - offset) / sum;
                 if (Double.isNaN(mat[i][j])) mat[i][j] = 1;
             }
@@ -283,11 +303,10 @@ public class Utils {
         int rows = matrix.length;
         int cols = matrix[0].length;
 
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
+        IntStream.range(0, rows).parallel().forEach(i ->
+            IntStream.range(0, cols).forEach(j ->{
                 mat[i][j] = 1/(1 + Math.exp(-matrix[i][j]));
-            }
-        }
+            }));
     }
 
     public static double[][] sigmoidDerivative (double[][] activated) {

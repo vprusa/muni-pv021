@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 /**
  * This class contains settings
  *
- * Settings are set of variables that can be passed via commandline or default static values
+ * Settings are set of variables that can be passed via commandline and have default values
  *
  * @author <a href="mailto:prusa.vojtech@email.com">Vojtech Prusa</a>
  */
@@ -98,15 +98,15 @@ public class Settings {
 
     public static int[] architecture = new int[] {784, 128, 10};;
 
-    public static int layers(){
-        return architecture != null ? architecture.length-1 : 0;
+    public int layers(){
+        return architecture != null ? architecture.length - 1 : -1;
     }
 
     public static double learningRate = 0.05;
 
     public static int miniBatchSize = 200;
 
-    public static double momentum = 0.8;
+    public static double momentum = 0.80;
 
     public static int epochs = 16;
 
@@ -119,13 +119,13 @@ public class Settings {
     public static String trainPredictions = "evaluator/trainPredictions";
 
     /* Data provided to us by the teacher */
-    public static String trainData = "mnist_train_vectors.csv";
+    public static String trainData = resourcesDir + "mnist_train_vectors.csv";
 
-    public static String trainLabels = "mnist_train_labels.csv";
+    public static String trainLabels = resourcesDir + "mnist_train_labels.csv";
 
-    public static String testData = "mnist_test_vectors.csv";
+    public static String testData = resourcesDir + "mnist_test_vectors.csv";
 
-    public static String testLabels = "mnist_test_labels.csv";
+    public static String testLabels = resourcesDir + "mnist_test_labels.csv";
 
     public static int seed = 138;
 
@@ -152,7 +152,4 @@ public class Settings {
         log.info(msg.toString());
     }
 
-    public static void setLearningRate(double learningRate) {
-        Settings.learningRate = learningRate;
-    }
 }
