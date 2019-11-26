@@ -45,6 +45,9 @@ public class Settings {
                     case "epochs":
                         this.epochs = Integer.parseInt(a.replace(argNameFull,""));
                         break;
+                    case "parallelStreams":
+                        this.parallelStreams = Boolean.parseBoolean(a.replace(argNameFull,""));
+                        break;
                     case "resourcesDir":
                         this.resourcesDir = a.replace(argNameFull,"");
                         break;
@@ -53,6 +56,7 @@ public class Settings {
                         break;
                     case "trainPredictions":
                         this.trainPredictions = a.replace(argNameFull, "");
+                        break;
                     case "answers":
                         this.answers = a.replace(argNameFull,"");
                         break;
@@ -110,6 +114,8 @@ public class Settings {
 
     public static int epochs = 16;
 
+    public static boolean parallelStreams = false;
+
     public static String resourcesDir = "./MNIST_DATA/";
 
     // results a.k.a answers
@@ -140,6 +146,7 @@ public class Settings {
         msg.append("miniBatchSize: " + miniBatchSize + "\n");
         msg.append("momentum: " + momentum + "\n");
         msg.append("epochs: " + epochs + "\n");
+        msg.append("parallelStreams: " + parallelStreams + "\n");
         msg.append("resourcesDir: " + resourcesDir + "\n");
         msg.append("seed: " + seed + "\n");
         msg.append("answers: " + answers + "\n");
