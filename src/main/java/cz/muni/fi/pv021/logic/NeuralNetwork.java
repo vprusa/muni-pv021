@@ -8,7 +8,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 
 /**
  * @author <a href="mailto:prusa.vojtech@email.com">Vojtech Prusa</a>
@@ -43,11 +42,11 @@ public class NeuralNetwork {
         assert tData != null;
         assert tLabels != null;
 
-        batches = new int[Utils.dataSetLength / settings.miniBatchSize][settings.dataPerLine][settings.miniBatchSize];
-        labels = new int[Utils.dataSetLength / settings.miniBatchSize][settings.dataClasses][settings.miniBatchSize];
+        batches = new int[settings.dataSetLength / settings.miniBatchSize][settings.dataPerLine][settings.miniBatchSize];
+        labels = new int[settings.dataSetLength / settings.miniBatchSize][settings.dataClasses][settings.miniBatchSize];
 
-        DataReader.readData(tData, batches, settings.dataPerLine, settings.miniBatchSize, Utils.dataSetLength);
-        DataReader.readData(tLabels, labels, 1, settings.miniBatchSize, Utils.dataSetLength);
+        DataReader.readData(tData, batches, settings.dataPerLine, settings.miniBatchSize, settings.dataSetLength);
+        DataReader.readData(tLabels, labels, 1, settings.miniBatchSize, settings.dataSetLength);
 
         mlp = new MLP(settings);
     }
@@ -57,7 +56,7 @@ public class NeuralNetwork {
         long prevTime = System.currentTimeMillis();
         long diffTime = 0;
         for (int epoch = 0; epoch < settings.epochs; epoch++) {
-            for (int i = 0; i < Utils.dataSetLength / settings.miniBatchSize; i++) {
+            for (int i = 0; i < settings.dataSetLength / settings.miniBatchSize; i++) {
                 //mlp.evaluate(batches[i]);
                 mlp.evaluate(batches[i]);
                 mlp.momentumLayer3BackProp(batches[i], labels[i]);
@@ -77,8 +76,8 @@ public class NeuralNetwork {
     public void evaluations() {
         log.info("Starting evaluations");
 
-        testLabelsCheck = new double[Utils.dataSetLength / settings.miniBatchSize][][];
-        for (int i = 0; i < Utils.dataSetLength / settings.miniBatchSize; i++) {
+        testLabelsCheck = new double[settings.dataSetLength / settings.miniBatchSize][][];
+        for (int i = 0; i < settings.dataSetLength / settings.miniBatchSize; i++) {
             mlp.evaluate(batches[i]);
             testLabelsCheck[i] = Utils.transposeMat(mlp.getActivations().get(1));
         }
@@ -94,11 +93,11 @@ public class NeuralNetwork {
 
         assert control != null;
 
-        controlTest = new int[Utils.testSetLength / settings.miniBatchSize][settings.dataPerLine][settings.miniBatchSize];
-        DataReader.readData(control, controlTest, settings.dataPerLine, settings.miniBatchSize, Utils.testSetLength);
+        controlTest = new int[settings.testSetLength / settings.miniBatchSize][settings.dataPerLine][settings.miniBatchSize];
+        DataReader.readData(control, controlTest, settings.dataPerLine, settings.miniBatchSize, settings.testSetLength);
 
-        answers = new double[Utils.testSetLength / settings.miniBatchSize][][];
-        for (int i = 0; i < Utils.testSetLength / settings.miniBatchSize; i++) {
+        answers = new double[settings.testSetLength / settings.miniBatchSize][][];
+        for (int i = 0; i < settings.testSetLength / settings.miniBatchSize; i++) {
             mlp.evaluate(controlTest[i]);
             answers[i] = Utils.transposeMat(mlp.getActivations().get(1));
         }

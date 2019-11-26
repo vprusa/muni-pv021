@@ -78,6 +78,12 @@ public class Settings {
                     case "dataClasses":
                         this.dataClasses = Integer.parseInt(a.replace(argNameFull,""));
                         break;
+                    case "dataSetLength":
+                        this.dataSetLength = Integer.parseInt(a.replace(argNameFull,""));
+                        break;
+                    case "testSetLength":
+                        this.testSetLength = Integer.parseInt(a.replace(argNameFull,""));
+                        break;
                     default:
                         log.severe("Illegal parameter usage");
                 }
@@ -139,6 +145,11 @@ public class Settings {
 
     public static int dataClasses = 10;
 
+    public static int dataSetLength = 60000;
+
+    public static int testSetLength = 10000;
+
+
     public void printSettings(){
         StringBuilder msg = new StringBuilder("");
         msg.append("architecture: " + architecture + "\n");
@@ -156,6 +167,8 @@ public class Settings {
         msg.append("testLabels: " + testLabels + "\n");
         msg.append("dataPerLine: " + dataPerLine + "\n");
         msg.append("dataClasses: " + dataClasses + "\n");
+        msg.append("dataSetLength: " + dataSetLength + "\n");
+        msg.append("testSetLength: " + testSetLength + "\n");
         log.info(msg.toString());
     }
 
