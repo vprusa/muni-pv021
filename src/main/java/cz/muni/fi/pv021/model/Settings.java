@@ -132,7 +132,7 @@ public class Settings {
     // consider that the depth of recursion implementation of evaluation parallel streams is 2
     // (ideally use multiplications of 2?)
     // also consider that max number should be number of processors (maybe -1 because of main thread)
-    public static int useForkJoinParallelism = 7;
+    public static int useForkJoinParallelism = 4;
 
     public static String resourcesDir = "./MNIST_DATA/";
 
