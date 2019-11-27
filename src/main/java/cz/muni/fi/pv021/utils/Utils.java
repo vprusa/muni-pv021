@@ -1,8 +1,12 @@
 package cz.muni.fi.pv021.utils;
 
 import java.util.Random;
+import java.util.function.BiFunction;
+import java.util.function.LongFunction;
 import java.util.function.UnaryOperator;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 /**
  * This class contains
@@ -48,35 +52,23 @@ public class Utils {
 
     public static double[][] randomMat(int rows, int cols) {
         double[][] mat = new double[rows][cols];
-        StreamBuilder.rangeInt(0, rows).forEach(i ->
-                StreamBuilder.rangeInt(0, cols).forEach(j -> {
-                    mat[i][j] = uniformDouble();
-                    ;
-                }));
+
+        StreamBuilder.forkJoinFor(IntStream::forEach, i ->
+                StreamBuilder.rangeInt(0, cols).forEach(j ->
+                        mat[i][j] = uniformDouble()
+                )).apply(StreamBuilder.rangeInt(0, rows));
 
         return mat;
     }
 
     public static double[][] transposeMat(double[][] matrix) {
         return transposeDouble().apply(matrix);
-        /*
-        int rows = matrix.length;
-        int cols = matrix[0].length;
-        double[][] mat = new double[cols][rows];
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                mat[j][i] = matrix[i][j];
-            }
-        }
-        return mat;
-        */
     }
 
     public static UnaryOperator<double[][]> transposeDouble() {
         return m -> {
-            return StreamBuilder.rangeLong(0, m[0].length).mapToObj(r ->
-                    StreamBuilder.rangeLong(0, m.length).mapToDouble(c -> m[(int) c][(int) r]).toArray()
+            return StreamBuilder.rangeLong(0, m[0].length, false).mapToObj(r ->
+                    StreamBuilder.rangeLong(0, m.length, false).mapToDouble(c -> m[(int) c][(int) r]).toArray()
             ).toArray(double[][]::new);
         };
     }
@@ -84,23 +76,12 @@ public class Utils {
 
     public static int[][] transposeMat(int[][] matrix) {
         return transposeInt().apply(matrix);
-        /*
-        int rows = matrix.length;
-        int cols = matrix[0].length;
-        int[][] mat = new int[cols][rows];
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                mat[j][i] = matrix[i][j];
-            }
-        }
-        return mat;
-        */
     }
 
     public static UnaryOperator<int[][]> transposeInt() {
         return m -> {
-            return StreamBuilder.rangeInt(0, m[0].length).mapToObj(r ->
-                    StreamBuilder.rangeInt(0, m.length).map(c -> m[c][r]).toArray()
+            return StreamBuilder.rangeInt(0, m[0].length, false).mapToObj(r ->
+                    StreamBuilder.rangeInt(0, m.length, false).map(c -> m[c][r]).toArray()
             ).toArray(int[][]::new);
         };
     }
@@ -109,10 +90,10 @@ public class Utils {
         int rows = mat1.length;
         int cols = mat1[0].length;
 
-        StreamBuilder.rangeInt(0, rows).forEach(i ->
-                StreamBuilder.rangeInt(0, cols).forEach(j -> {
-                    mat[i][j] = mat1[i][j] + mat2[i][j];
-                }));
+        StreamBuilder.forkJoinFor(IntStream::forEach, (i ->
+                StreamBuilder.rangeInt(0, cols).forEach(j ->
+                        mat[i][j] = mat1[i][j] + mat2[i][j]
+                ))).apply(StreamBuilder.rangeInt(0, rows));
     }
 
     public static void addConstantToMat(double num, double[][] matrix, double[][] mat) {
@@ -129,47 +110,43 @@ public class Utils {
         int rows = matrix.length;
         int cols = matrix[0].length;
 
-        StreamBuilder.rangeInt(0, rows).forEach(i -> {
+        StreamBuilder.forkJoinFor(IntStream::forEach, i -> {
             mat[i][0] = 0;
-            StreamBuilder.rangeInt(0, cols).forEach(j -> {
+            StreamBuilder.rangeInt(0, cols, false).forEach(j -> {
                 mat[i][0] += matrix[i][j];
             });
             mat[i][0] /= cols;
-        });
+        }).apply(StreamBuilder.rangeInt(0, rows));
     }
 
     public static void addVectorToMat(double[][] mat1, double[][] vec, double[][] mat) {
         int rows = mat1.length;
         int cols = mat1[0].length;
 
-
-        StreamBuilder.rangeInt(0, rows).forEach(i -> {
-            StreamBuilder.rangeInt(0, cols).forEach(j -> {
-                mat[i][j] = mat1[i][j] + vec[i][0];
-            });
-        });
+        StreamBuilder.forkJoinFor(IntStream::forEach, (i ->
+                StreamBuilder.rangeInt(0, cols).forEach(j ->
+                        mat[i][j] = mat1[i][j] + vec[i][0]
+                ))).apply(StreamBuilder.rangeInt(0, rows));
     }
 
     public static void subtractMats(double[][] mat1, double[][] mat2, double[][] mat) {
         int rows = mat1.length;
         int cols = mat1[0].length;
 
-        StreamBuilder.rangeInt(0, rows).forEach(i -> {
-            StreamBuilder.rangeInt(0, cols).forEach(j -> {
-                mat[i][j] = mat1[i][j] - mat2[i][j];
-            });
-        });
+        StreamBuilder.forkJoinFor(IntStream::forEach, (i ->
+                StreamBuilder.rangeInt(0, cols).forEach(j ->
+                        mat[i][j] = mat1[i][j] - mat2[i][j]
+                ))).apply(StreamBuilder.rangeInt(0, rows));
     }
 
     public static void subtractMats(double[][] mat1, int[][] mat2, double[][] mat) {
         int rows = mat1.length;
         int cols = mat1[0].length;
 
-        StreamBuilder.rangeInt(0, rows).forEach(i -> {
-            StreamBuilder.rangeInt(0, cols).forEach(j -> {
-                mat[i][j] = mat1[i][j] - mat2[i][j];
-            });
-        });
+        StreamBuilder.forkJoinFor(IntStream::forEach, (i ->
+                StreamBuilder.rangeInt(0, cols).forEach(j ->
+                        mat[i][j] = mat1[i][j] - mat2[i][j]
+                ))).apply(StreamBuilder.rangeInt(0, rows));
     }
 
     public static double[][] elementWiseMultiplicationNew(double[][] mat1, double[][] mat2) {
@@ -181,11 +158,12 @@ public class Utils {
         }
 
         double[][] mat = new double[rows][cols];
-        StreamBuilder.rangeInt(0, rows).forEach(i -> {
-            StreamBuilder.rangeInt(0, cols).forEach(j -> {
-                mat[i][j] = mat1[i][j] * mat2[i][j];
-            });
-        });
+
+        StreamBuilder.forkJoinFor(IntStream::forEach, (i ->
+                StreamBuilder.rangeInt(0, cols).forEach(j ->
+                        mat[i][j] = mat1[i][j] * mat2[i][j]
+                ))).apply(StreamBuilder.rangeInt(0, rows));
+
         return mat;
     }
 
@@ -197,11 +175,10 @@ public class Utils {
             throw new RuntimeException("Invalid dimensions in elementWiseMultiplication");
         }
 
-        StreamBuilder.rangeInt(0, rows).forEach(i -> {
-            StreamBuilder.rangeInt(0, cols).forEach(j -> {
-                mat1[i][j] *= mat2[i][j];
-            });
-        });
+        StreamBuilder.forkJoinFor(IntStream::forEach, (i ->
+                StreamBuilder.rangeInt(0, cols).forEach(j ->
+                        mat1[i][j] *= mat2[i][j]
+                ))).apply(StreamBuilder.rangeInt(0, rows));
     }
 
     public static double[][] multiplyMatByConstantNew(double num, double[][] matrix) {
@@ -210,11 +187,11 @@ public class Utils {
 
         double[][] mat = new double[rows][cols];
 
-        StreamBuilder.rangeInt(0, rows).forEach(i -> {
-            StreamBuilder.rangeInt(0, cols).forEach(j -> {
-                mat[i][j] = matrix[i][j] * num;
-            });
-        });
+        StreamBuilder.forkJoinFor(IntStream::forEach, (i ->
+                StreamBuilder.rangeInt(0, cols).forEach(j ->
+                        mat[i][j] = matrix[i][j] * num
+                ))).apply(StreamBuilder.rangeInt(0, rows));
+
         return mat;
     }
 
@@ -222,10 +199,11 @@ public class Utils {
         int rows = matrix.length;
         int cols = matrix[0].length;
 
-        StreamBuilder.rangeInt(0, rows).forEach(i ->
-                StreamBuilder.rangeInt(0, cols).forEach(j -> {
-                    matrix[i][j] *= num;
-                }));
+        StreamBuilder.forkJoinFor(IntStream::forEach, (i ->
+                StreamBuilder.rangeInt(0, cols).forEach(j ->
+                        matrix[i][j] *= num
+                ))).apply(StreamBuilder.rangeInt(0, rows));
+
     }
 
     public static void matrixMultiplication(double[][] mat1, double[][] mat2, double[][] mat) {
@@ -243,23 +221,12 @@ public class Utils {
                         mat[i][j] = 0;
                         // this cannot be initialized via builder because it has to be sequential so waiting/deadlock
                         // would not occur
-                        IntStream.range(0, cols1).forEach(k -> {
+                        StreamBuilder.rangeInt(0, cols1, false).forEach(k -> {
                             mat[i][j] += (mat1[i][k] * mat2[k][j]);
                         });
                     });
                 }
         ).apply(StreamBuilder.rangeInt(0, rows1));
-        /*
-        StreamBuilder.rangeInt(0, rows1).forEach(i ->
-            StreamBuilder.rangeInt(0, cols2).forEach(j -> {
-                mat[i][j] = 0;
-                // this cannot be initialized via builder because it has to be sequential so waiting/deadlock
-                // would not occur
-                IntStream.range(0, cols1).forEach(k -> {
-                    mat[i][j] += (mat1[i][k] * mat2[k][j]);
-                });
-            }));
-         */
     }
 
     public static void matrixMultiplication(double[][] mat1, int[][] mat2, double[][] mat) {
@@ -273,14 +240,17 @@ public class Utils {
         int rows1 = mat1.length;
         int cols2 = mat2[0].length;
 
-        StreamBuilder.rangeInt(0, rows1).forEach(i ->
-                StreamBuilder.rangeInt(0, cols2).forEach(j -> {
-                    mat[i][j] = 0;
-                    IntStream.range(0, cols1).forEach(k -> {
-                                mat[i][j] += (mat1[i][k] * mat2[k][j]);
-                            }
-                    );
-                }));
+        StreamBuilder.forkJoinFor(IntStream::forEach, i -> {
+                    StreamBuilder.rangeInt(0, cols2).forEach(j -> {
+                        mat[i][j] = 0;
+                        // this cannot be initialized via builder because it has to be sequential so waiting/deadlock
+                        // would not occur
+                        StreamBuilder.rangeInt(0, cols1, false).forEach(k -> {
+                            mat[i][j] += (mat1[i][k] * mat2[k][j]);
+                        });
+                    });
+                }
+        ).apply(StreamBuilder.rangeInt(0, rows1));
     }
 
     // TODO use Streams (StreamBuilder)
@@ -316,10 +286,11 @@ public class Utils {
         int rows = matrix.length;
         int cols = matrix[0].length;
 
-        StreamBuilder.rangeInt(0, rows).forEach(i ->
-                StreamBuilder.rangeInt(0, cols).forEach(j -> {
-                    mat[i][j] = 1 / (1 + Math.exp(-matrix[i][j]));
-                }));
+
+        StreamBuilder.forkJoinFor(IntStream::forEach, i ->
+                StreamBuilder.rangeInt(0, cols).forEach(j ->
+                        mat[i][j] = 1 / (1 + Math.exp(-matrix[i][j]))
+                )).apply(StreamBuilder.rangeInt(0, rows));
     }
 
     public static double[][] sigmoidDerivative(double[][] activated) {

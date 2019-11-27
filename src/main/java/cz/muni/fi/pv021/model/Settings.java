@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 
 /**
  * This class contains settings
- *
+ * <p>
  * Settings are set of variables that can be passed via commandline and have default values
  *
  * @author <a href="mailto:prusa.vojtech@email.com">Vojtech Prusa</a>
@@ -25,79 +25,77 @@ public class Settings {
                     log.severe("Error at argument " + a);
                     break;
                 }
-                final String argNameFull = a.substring(0,a.indexOf('=')+1);
-                final String argName = argNameFull.substring(argNameFull.lastIndexOf('-')+1,argNameFull.indexOf('='));
+                final String argNameFull = a.substring(0, a.indexOf('=') + 1);
+                final String argName = argNameFull.substring(argNameFull.lastIndexOf('-') + 1, argNameFull.indexOf('='));
                 options = new ArrayList<>();
-                switch(argName){
+                switch (argName) {
                     case "architecture":
-                        this.architecture = Arrays.stream(a.replace(argNameFull,"")
+                        this.architecture = Arrays.stream(a.replace(argNameFull, "")
                                 .split(",")).mapToInt(Integer::parseInt).toArray();
                         break;
                     case "learningRate":
-                        this.learningRate = Double.parseDouble(a.replace(argNameFull,""));
+                        this.learningRate = Double.parseDouble(a.replace(argNameFull, ""));
                         break;
                     case "miniBatchSize":
-                        this.miniBatchSize = Integer.parseInt(a.replace(argNameFull,""));
+                        this.miniBatchSize = Integer.parseInt(a.replace(argNameFull, ""));
                         break;
                     case "momentum":
-                        this.momentum = Double.parseDouble(a.replace(argNameFull,""));
+                        this.momentum = Double.parseDouble(a.replace(argNameFull, ""));
                         break;
                     case "epochs":
-                        this.epochs = Integer.parseInt(a.replace(argNameFull,""));
+                        this.epochs = Integer.parseInt(a.replace(argNameFull, ""));
                         break;
                     case "parallelStreams":
-                        this.parallelStreams = Boolean.parseBoolean(a.replace(argNameFull,""));
+                        this.parallelStreams = Boolean.parseBoolean(a.replace(argNameFull, ""));
                         break;
                     case "useForkJoin":
-                        this.useForkJoin = Boolean.parseBoolean(a.replace(argNameFull,""));
+                        this.useForkJoin = Boolean.parseBoolean(a.replace(argNameFull, ""));
                         break;
                     case "useForkJoinParallelism":
-                        this.useForkJoinParallelism = Integer.parseInt(a.replace(argNameFull,""));
+                        this.useForkJoinParallelism = Integer.parseInt(a.replace(argNameFull, ""));
                         break;
                     case "resourcesDir":
-                        this.resourcesDir = a.replace(argNameFull,"");
+                        this.resourcesDir = a.replace(argNameFull, "");
                         break;
                     case "seed":
-                        this.seed = Integer.parseInt(a.replace(argNameFull,""));
+                        this.seed = Integer.parseInt(a.replace(argNameFull, ""));
                         break;
                     case "trainPredictions":
                         this.trainPredictions = a.replace(argNameFull, "");
                         break;
                     case "answers":
-                        this.answers = a.replace(argNameFull,"");
+                        this.answers = a.replace(argNameFull, "");
                         break;
                     case "trainData":
-                        this.trainData = a.replace(argNameFull,"");
+                        this.trainData = a.replace(argNameFull, "");
                         break;
                     case "trainLabels":
-                        this.trainLabels = a.replace(argNameFull,"");
+                        this.trainLabels = a.replace(argNameFull, "");
                         break;
                     case "testData":
-                        this.testData = a.replace(argNameFull,"");
+                        this.testData = a.replace(argNameFull, "");
                         break;
                     case "testLabels":
-                        this.testLabels = a.replace(argNameFull,"");
+                        this.testLabels = a.replace(argNameFull, "");
                         break;
                     case "dataPerLine":
-                        this.dataPerLine = Integer.parseInt(a.replace(argNameFull,""));
+                        this.dataPerLine = Integer.parseInt(a.replace(argNameFull, ""));
                         break;
                     case "dataClasses":
-                        this.dataClasses = Integer.parseInt(a.replace(argNameFull,""));
+                        this.dataClasses = Integer.parseInt(a.replace(argNameFull, ""));
                         break;
                     case "dataSetLength":
-                        this.dataSetLength = Integer.parseInt(a.replace(argNameFull,""));
+                        this.dataSetLength = Integer.parseInt(a.replace(argNameFull, ""));
                         break;
                     case "testSetLength":
-                        this.testSetLength = Integer.parseInt(a.replace(argNameFull,""));
+                        this.testSetLength = Integer.parseInt(a.replace(argNameFull, ""));
                         break;
                     default:
                         log.severe("Illegal parameter usage");
                 }
-            }
-            else if (options != null) {
+            } else if (options != null) {
                 options.add(a);
-            }
-            else {
+            } else {
                 log.severe("Illegal parameter usage");
                 break;
             }
@@ -112,9 +110,10 @@ public class Settings {
         this.momentum = momentum;
     }
 
-    public static int[] architecture = new int[] {784, 128, 10};;
+    public static int[] architecture = new int[]{784, 128, 10};
+    ;
 
-    public int layers(){
+    public int layers() {
         return architecture != null ? architecture.length - 1 : -1;
     }
 
@@ -130,8 +129,10 @@ public class Settings {
 
     public static boolean useForkJoin = true;
 
-    //  best was to use parallelism=[4..8..16] larger or lesser has worse performance
-    public static int useForkJoinParallelism = 16;
+    // consider that the depth of recursion implementation of evaluation parallel streams is 2
+    // (ideally use multiplications of 2?)
+    // also consider that max number should be number of processors (maybe -1 because of main thread)
+    public static int useForkJoinParallelism = 7;
 
     public static String resourcesDir = "./MNIST_DATA/";
 
@@ -160,7 +161,7 @@ public class Settings {
 
     public static int testSetLength = 10000;
 
-    public void printSettings(){
+    public void printSettings() {
         StringBuilder msg = new StringBuilder("");
         msg.append("architecture: " + architecture + "\n");
         msg.append("learningRate: " + learningRate + "\n");
