@@ -19,4 +19,23 @@ mkdir -p ${TARGET_DIR}
 find ${SRC_DIR} -name '*.class' | rm -f
 find ${SRC_DIR} -name '*.java' | xargs javac -d ${TARGET_DIR}
 jar cvf ${JAR_FILE} -C ${TARGET_DIR} .
+TIME_START=`date +%Y-%m-%d_%H-%M-%S`
+echo "Starting java execution: ${TIME_START}"
 java -cp ${JAR_FILE} cz.muni.fi.pv021.Application
+TIME_END=`date +%Y-%m-%d_%H-%M-%S`
+echo "Ending java execution: ${TIME_START} -> ${TIME_END}"
+
+# r = check results
+if [[ ! -z "${1}" && "${1}" == *"r"* ]] ; then
+    # exit or generate and compare Results with latest
+    echo "Show previous results.. "
+    cat Results
+    rm -rf Results.bkp
+    mv Results Results.bkp
+    echo "Run automatic evaluator "
+    java -jar ./fi-muni-pv021-automatic-evaluator-1.0-SNAPSHOT-jar-with-dependencies.jar \
+      ./evaluator/actualTestPredictions ./MNIST_DATA/mnist_test_labels.csv 10
+    echo "Show current results"
+    cat Results
+    diff Results Results.bkp
+fi

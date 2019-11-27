@@ -12,11 +12,11 @@ import cz.muni.fi.pv021.model.Settings;
  */
 public class Application {
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         Settings settings = new Settings(args);
         NeuralNetwork nn = NeuralNetworkFactory.create(settings);
         nn.learning();
-        nn.recognizing();
+        nn.evaluations();
     }
 
 }

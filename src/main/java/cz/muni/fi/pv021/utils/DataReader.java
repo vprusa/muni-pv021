@@ -11,11 +11,11 @@ import java.io.IOException;
 public class DataReader {
 
     public static void readData(BufferedReader data, int[][][] features, int featuresPerLine, int batchSize,
-                                 int fileLength) {
+                                int fileLength) {
         String number;
 
         try {
-            for (int i = 0; i < fileLength/batchSize; i++) {
+            for (int i = 0; i < fileLength / batchSize; i++) {
                 for (int cols = 0; cols < batchSize; cols++) {
                     number = data.readLine();
                     if (featuresPerLine != 1) {
@@ -49,7 +49,7 @@ public class DataReader {
 
         assert outfile != null;
         int maxIndex;
-        for (double [][] batch : answers) {
+        for (double[][] batch : answers) {
             for (double[] answer : batch) {  //change to max
                 maxIndex = 0;
                 for (int i = 1; i < answer.length; i++) {

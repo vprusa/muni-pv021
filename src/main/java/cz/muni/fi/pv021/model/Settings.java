@@ -5,8 +5,8 @@ import java.util.logging.Logger;
 
 /**
  * This class contains settings
- *
- * Settings are set of variables that can be passed via commandline or default static values
+ * <p>
+ * Settings are set of variables that can be passed via commandline and have default values
  *
  * @author <a href="mailto:prusa.vojtech@email.com">Vojtech Prusa</a>
  */
@@ -25,63 +25,77 @@ public class Settings {
                     log.severe("Error at argument " + a);
                     break;
                 }
-                final String argNameFull = a.substring(0,a.indexOf('=')+1);
-                final String argName = argNameFull.substring(argNameFull.lastIndexOf('-')+1,argNameFull.indexOf('='));
+                final String argNameFull = a.substring(0, a.indexOf('=') + 1);
+                final String argName = argNameFull.substring(argNameFull.lastIndexOf('-') + 1, argNameFull.indexOf('='));
                 options = new ArrayList<>();
-                switch(argName){
+                switch (argName) {
                     case "architecture":
-                        this.architecture = Arrays.stream(a.replace(argNameFull,"")
+                        this.architecture = Arrays.stream(a.replace(argNameFull, "")
                                 .split(",")).mapToInt(Integer::parseInt).toArray();
                         break;
                     case "learningRate":
-                        this.learningRate = Double.parseDouble(a.replace(argNameFull,""));
+                        this.learningRate = Double.parseDouble(a.replace(argNameFull, ""));
                         break;
                     case "miniBatchSize":
-                        this.miniBatchSize = Integer.parseInt(a.replace(argNameFull,""));
+                        this.miniBatchSize = Integer.parseInt(a.replace(argNameFull, ""));
                         break;
                     case "momentum":
-                        this.momentum = Double.parseDouble(a.replace(argNameFull,""));
+                        this.momentum = Double.parseDouble(a.replace(argNameFull, ""));
                         break;
                     case "epochs":
-                        this.epochs = Integer.parseInt(a.replace(argNameFull,""));
+                        this.epochs = Integer.parseInt(a.replace(argNameFull, ""));
+                        break;
+                    case "parallelStreams":
+                        this.parallelStreams = Boolean.parseBoolean(a.replace(argNameFull, ""));
+                        break;
+                    case "useForkJoin":
+                        this.useForkJoin = Boolean.parseBoolean(a.replace(argNameFull, ""));
+                        break;
+                    case "useForkJoinParallelism":
+                        this.useForkJoinParallelism = Integer.parseInt(a.replace(argNameFull, ""));
                         break;
                     case "resourcesDir":
-                        this.resourcesDir = a.replace(argNameFull,"");
+                        this.resourcesDir = a.replace(argNameFull, "");
                         break;
                     case "seed":
-                        this.seed = Integer.parseInt(a.replace(argNameFull,""));
+                        this.seed = Integer.parseInt(a.replace(argNameFull, ""));
                         break;
                     case "trainPredictions":
                         this.trainPredictions = a.replace(argNameFull, "");
+                        break;
                     case "answers":
-                        this.answers = a.replace(argNameFull,"");
+                        this.answers = a.replace(argNameFull, "");
                         break;
                     case "trainData":
-                        this.trainData = a.replace(argNameFull,"");
+                        this.trainData = a.replace(argNameFull, "");
                         break;
                     case "trainLabels":
-                        this.trainLabels = a.replace(argNameFull,"");
+                        this.trainLabels = a.replace(argNameFull, "");
                         break;
                     case "testData":
-                        this.testData = a.replace(argNameFull,"");
+                        this.testData = a.replace(argNameFull, "");
                         break;
                     case "testLabels":
-                        this.testLabels = a.replace(argNameFull,"");
+                        this.testLabels = a.replace(argNameFull, "");
                         break;
                     case "dataPerLine":
-                        this.dataPerLine = Integer.parseInt(a.replace(argNameFull,""));
+                        this.dataPerLine = Integer.parseInt(a.replace(argNameFull, ""));
                         break;
                     case "dataClasses":
-                        this.dataClasses = Integer.parseInt(a.replace(argNameFull,""));
+                        this.dataClasses = Integer.parseInt(a.replace(argNameFull, ""));
+                        break;
+                    case "dataSetLength":
+                        this.dataSetLength = Integer.parseInt(a.replace(argNameFull, ""));
+                        break;
+                    case "testSetLength":
+                        this.testSetLength = Integer.parseInt(a.replace(argNameFull, ""));
                         break;
                     default:
                         log.severe("Illegal parameter usage");
                 }
-            }
-            else if (options != null) {
+            } else if (options != null) {
                 options.add(a);
-            }
-            else {
+            } else {
                 log.severe("Illegal parameter usage");
                 break;
             }
@@ -96,19 +110,29 @@ public class Settings {
         this.momentum = momentum;
     }
 
-    public static int[] architecture = new int[] {784, 128, 10};;
+    public static int[] architecture = new int[]{784, 128, 10};
+    ;
 
-    public static int layers(){
-        return architecture != null ? architecture.length-1 : 0;
+    public int layers() {
+        return architecture != null ? architecture.length - 1 : -1;
     }
 
     public static double learningRate = 0.05;
 
     public static int miniBatchSize = 200;
 
-    public static double momentum = 0.8;
+    public static double momentum = 0.80;
 
     public static int epochs = 16;
+
+    public static boolean parallelStreams = false;
+
+    public static boolean useForkJoin = true;
+
+    // consider that the depth of recursion implementation of evaluation parallel streams is 2
+    // (ideally use multiplications of 2?)
+    // also consider that max number should be number of processors (maybe -1 because of main thread)
+    public static int useForkJoinParallelism = 4;
 
     public static String resourcesDir = "./MNIST_DATA/";
 
@@ -119,13 +143,13 @@ public class Settings {
     public static String trainPredictions = "evaluator/trainPredictions";
 
     /* Data provided to us by the teacher */
-    public static String trainData = "mnist_train_vectors.csv";
+    public static String trainData = resourcesDir + "mnist_train_vectors.csv";
 
-    public static String trainLabels = "mnist_train_labels.csv";
+    public static String trainLabels = resourcesDir + "mnist_train_labels.csv";
 
-    public static String testData = "mnist_test_vectors.csv";
+    public static String testData = resourcesDir + "mnist_test_vectors.csv";
 
-    public static String testLabels = "mnist_test_labels.csv";
+    public static String testLabels = resourcesDir + "mnist_test_labels.csv";
 
     public static int seed = 138;
 
@@ -133,13 +157,20 @@ public class Settings {
 
     public static int dataClasses = 10;
 
-    public void printSettings(){
+    public static int dataSetLength = 60000;
+
+    public static int testSetLength = 10000;
+
+    public void printSettings() {
         StringBuilder msg = new StringBuilder("");
         msg.append("architecture: " + architecture + "\n");
         msg.append("learningRate: " + learningRate + "\n");
         msg.append("miniBatchSize: " + miniBatchSize + "\n");
         msg.append("momentum: " + momentum + "\n");
         msg.append("epochs: " + epochs + "\n");
+        msg.append("parallelStreams: " + parallelStreams + "\n");
+        msg.append("useForkJoin: " + useForkJoin + "\n");
+        msg.append("useForkJoinParallelism: " + useForkJoinParallelism + "\n");
         msg.append("resourcesDir: " + resourcesDir + "\n");
         msg.append("seed: " + seed + "\n");
         msg.append("answers: " + answers + "\n");
@@ -149,10 +180,9 @@ public class Settings {
         msg.append("testLabels: " + testLabels + "\n");
         msg.append("dataPerLine: " + dataPerLine + "\n");
         msg.append("dataClasses: " + dataClasses + "\n");
+        msg.append("dataSetLength: " + dataSetLength + "\n");
+        msg.append("testSetLength: " + testSetLength + "\n");
         log.info(msg.toString());
     }
 
-    public static void setLearningRate(double learningRate) {
-        Settings.learningRate = learningRate;
-    }
 }

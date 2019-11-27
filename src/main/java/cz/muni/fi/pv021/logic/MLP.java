@@ -13,12 +13,17 @@ import java.util.logging.Logger;
  */
 public class MLP {
 
-    static final Logger log = Logger.getLogger(MLP.class.getSimpleName());
+    private static final Logger log = Logger.getLogger(MLP.class.getSimpleName());
+    private Settings settings;
 
-    public List<double[][]> weights;
+    private double momentum;
+    private double learningRate;
+
+    private List<double[][]> weights;
     private List<double[][]> biases;
     private List<double[][]> potentials;
-    public List<double[][]> activations;
+
+    private List<double[][]> activations;
 
     private List<double[][]> diffPotentials;
     private List<double[][]> diffWeights;
@@ -27,47 +32,43 @@ public class MLP {
     private List<double[][]> momentumWeights;
     private List<double[][]> momentumBiases;
 
-    private Settings settings;
-
     public MLP(Settings settings) {
         this.settings = settings;
+        this.momentum = settings.momentum;
+        this.learningRate = settings.learningRate;
 
-        this.weights = new ArrayList<double[][]>();
-        this.biases = new ArrayList<double[][]>();
-        this.activations = new ArrayList<double[][]>();
-        this.potentials = new ArrayList<double[][]>();
+        this.weights = new ArrayList<>();
+        this.biases = new ArrayList<>();
+        this.activations = new ArrayList<>();
+        this.potentials = new ArrayList<>();
 
-        this.diffBiases = new ArrayList<double[][]>();
-        this.diffWeights = new ArrayList<double[][]>();
-        this.diffPotentials = new ArrayList<double[][]>();
+        this.diffBiases = new ArrayList<>();
+        this.diffWeights = new ArrayList<>();
+        this.diffPotentials = new ArrayList<>();
 
-        this.momentumWeights = new ArrayList<double[][]>();
-        this.momentumBiases = new ArrayList<double[][]>();
+        this.momentumWeights = new ArrayList<>();
+        this.momentumBiases = new ArrayList<>();
 
         for (int i = 1; i <= settings.layers(); i++) {
-            double[][] mat = Utils.randomMat(settings.architecture[i], settings.architecture[i-1]);
-            Utils.multiplyMatByConstant(Math.sqrt(1d/settings.architecture[i-1]), mat);
+            double[][] mat = Utils.randomMat(settings.architecture[i], settings.architecture[i - 1]);
+            Utils.multiplyMatByConstant(Math.sqrt(1d / settings.architecture[i - 1]), mat);
             this.weights.add(mat);   //can be improved for better initialization
-            this.biases.add(initMatrix(settings.architecture[i], 1));
-            this.activations.add(initMatrix(settings.architecture[i], settings.miniBatchSize));
-            this.potentials.add(initMatrix(settings.architecture[i], settings.miniBatchSize));
+            this.biases.add(new double[settings.architecture[i]][1]);
+            this.activations.add(new double[settings.architecture[i]][settings.miniBatchSize]);
+            this.potentials.add(new double[settings.architecture[i]][settings.miniBatchSize]);
 
-            this.diffBiases.add(initMatrix(settings.architecture[i], 1));
-            this.diffPotentials.add(initMatrix(settings.architecture[i], settings.miniBatchSize));
-            this.diffWeights.add(initMatrix(settings.architecture[i], settings.architecture[i-1]));
+            this.diffBiases.add(new double[settings.architecture[i]][1]);
+            this.diffPotentials.add(new double[settings.architecture[i]][settings.miniBatchSize]);
+            this.diffWeights.add(new double[settings.architecture[i]][settings.architecture[i - 1]]);
 
-            this.momentumBiases.add(initMatrix(settings.architecture[i], 1));
-            this.momentumWeights.add(initMatrix(settings.architecture[i], settings.architecture[i-1]));
+            this.momentumBiases.add(new double[settings.architecture[i]][1]);
+            this.momentumWeights.add(new double[settings.architecture[i]][settings.architecture[i - 1]]);
         }
-    }
-
-    public double[][] initMatrix(int rows, int cols){
-        double[][] dArr = new double[rows][cols];
-        return dArr;
     }
 
     /**
      * Evaluates neural network. Could be much nicer if input was considered as first element of activations
+     *
      * @param inputLayer vector of inputs
      */
     public void evaluate(int[][] inputLayer) {
@@ -84,115 +85,106 @@ public class MLP {
         }
 
         // alone because of different activation function
-        Utils.matrixMultiplication(weights.get(settings.layers() - 1), activations.get(settings.layers() - 2),
-                potentials.get(settings.layers() - 1));
-        Utils.addVectorToMat(potentials.get(settings.layers() - 1), biases.get(settings.layers() - 1),
-                potentials.get(settings.layers() - 1));
+        Utils.matrixMultiplication(weights.get(settings.layers() - 1), activations.get(settings.layers() - 2), potentials.get(settings.layers() - 1));
+        Utils.addVectorToMat(potentials.get(settings.layers() - 1), biases.get(settings.layers() - 1), potentials.get(settings.layers() - 1));
         Utils.softmax(potentials.get(settings.layers() - 1), activations.get(settings.layers() - 1));
     }
 
     /**
-     * Calculates minibatch gradient descent with settings.momentum
+     * Calculates minibatch gradient descent with momentum
+     *
      * @param inputLayer minibatch with inputs
-     * @param label minibatch with expected outputs
+     * @param label      minibatch with expected outputs
      */
     public void momentumLayer3BackProp(int[][] inputLayer, int[][] label) {
         Utils.subtractMats(activations.get(settings.layers() - 1), label, diffPotentials.get(settings.layers() - 1));
 
-        Utils.matrixMultiplication(diffPotentials.get(settings.layers() - 1),
-                Utils.transposeMat(activations.get(settings.layers() - 2)), diffWeights.get(settings.layers() - 1));
-        Utils.multiplyMatByConstant(1d/settings.miniBatchSize, diffWeights.get(settings.layers() - 1));
+        Utils.matrixMultiplication(diffPotentials.get(settings.layers() - 1), Utils.transposeMat(activations.get(settings.layers() - 2)),
+                diffWeights.get(settings.layers() - 1));
+        Utils.multiplyMatByConstant(1d / settings.miniBatchSize, diffWeights.get(settings.layers() - 1));
 
         Utils.meanColumn(diffPotentials.get(settings.layers() - 1), diffBiases.get(settings.layers() - 1));
 
-        Utils.matrixMultiplication(Utils.transposeMat(weights.get(settings.layers()-1)),
-                diffPotentials.get(settings.layers() - 1), diffPotentials.get(settings.layers() - 2));
-        Utils.elementWiseMultiplication(diffPotentials.get(settings.layers() - 2),
-                Utils.sigmoidDerivative(activations.get(settings.layers()-2)));
+        Utils.matrixMultiplication(Utils.transposeMat(weights.get(settings.layers() - 1)), diffPotentials.get(settings.layers() - 1),
+                diffPotentials.get(settings.layers() - 2));
+        Utils.elementWiseMultiplication(diffPotentials.get(settings.layers() - 2), Utils.sigmoidDerivative(activations.get(settings.layers() - 2)));
 
-        Utils.matrixMultiplication(diffPotentials.get(settings.layers() - 2), Utils.transposeMat(inputLayer),
-                diffWeights.get(settings.layers() - 2));
-        Utils.multiplyMatByConstant(1d/settings.miniBatchSize, diffWeights.get(settings.layers() - 2));
+        Utils.matrixMultiplication(diffPotentials.get(settings.layers() - 2), Utils.transposeMat(inputLayer), diffWeights.get(settings.layers() - 2));
+        Utils.multiplyMatByConstant(1d / settings.miniBatchSize, diffWeights.get(settings.layers() - 2));
 
         Utils.meanColumn(diffPotentials.get(settings.layers() - 2), diffBiases.get(settings.layers() - 2));
 
-        //settings.momentum
-        Utils.addMats(Utils.multiplyMatByConstantNew(settings.momentum, momentumWeights.get(settings.layers() - 1)),
-                Utils.multiplyMatByConstantNew(1 - settings.momentum, diffWeights.get(settings.layers() - 1)),
+        //
+        Utils.addMats(Utils.multiplyMatByConstantNew(momentum, momentumWeights.get(settings.layers() - 1)),
+                Utils.multiplyMatByConstantNew(1 - momentum, diffWeights.get(settings.layers() - 1)),
                 momentumWeights.get(settings.layers() - 1));
-        Utils.addMats(Utils.multiplyMatByConstantNew(settings.momentum, momentumBiases.get(settings.layers() - 1)),
-                Utils.multiplyMatByConstantNew(1 - settings.momentum, diffBiases.get(settings.layers() - 1)),
+        Utils.addMats(Utils.multiplyMatByConstantNew(momentum, momentumBiases.get(settings.layers() - 1)),
+                Utils.multiplyMatByConstantNew(1 - momentum, diffBiases.get(settings.layers() - 1)),
                 momentumBiases.get(settings.layers() - 1));
 
-        Utils.addMats(Utils.multiplyMatByConstantNew(settings.momentum, momentumWeights.get(settings.layers() - 2)),
-                Utils.multiplyMatByConstantNew(1 - settings.momentum, diffWeights.get(settings.layers() - 2)),
+        Utils.addMats(Utils.multiplyMatByConstantNew(momentum, momentumWeights.get(settings.layers() - 2)),
+                Utils.multiplyMatByConstantNew(1 - momentum, diffWeights.get(settings.layers() - 2)),
                 momentumWeights.get(settings.layers() - 2));
-        Utils.addMats(Utils.multiplyMatByConstantNew(settings.momentum, momentumBiases.get(settings.layers() - 2)),
-                Utils.multiplyMatByConstantNew(1 - settings.momentum, diffBiases.get(settings.layers() - 2)),
+        Utils.addMats(Utils.multiplyMatByConstantNew(momentum, momentumBiases.get(settings.layers() - 2)),
+                Utils.multiplyMatByConstantNew(1 - momentum, diffBiases.get(settings.layers() - 2)),
                 momentumBiases.get(settings.layers() - 2));
 
         //update weights and biases
         Utils.subtractMats(weights.get(settings.layers() - 1),
-                Utils.multiplyMatByConstantNew(settings.learningRate, momentumWeights.get(settings.layers() - 1)),
-                weights.get(settings.layers() - 1));
+                Utils.multiplyMatByConstantNew(learningRate, momentumWeights.get(settings.layers() - 1)), weights.get(settings.layers() - 1));
         Utils.subtractMats(biases.get(settings.layers() - 1),
-                Utils.multiplyMatByConstantNew(settings.learningRate, momentumBiases.get(settings.layers() - 1)),
-                biases.get(settings.layers() - 1));
+                Utils.multiplyMatByConstantNew(learningRate, momentumBiases.get(settings.layers() - 1)), biases.get(settings.layers() - 1));
 
         Utils.subtractMats(weights.get(settings.layers() - 2),
-                Utils.multiplyMatByConstantNew(settings.learningRate, momentumWeights.get(settings.layers() - 2)),
-                weights.get(settings.layers() - 2));
+                Utils.multiplyMatByConstantNew(learningRate, momentumWeights.get(settings.layers() - 2)), weights.get(settings.layers() - 2));
         Utils.subtractMats(biases.get(settings.layers() - 2),
-                Utils.multiplyMatByConstantNew(settings.learningRate, momentumBiases.get(settings.layers() - 2)),
-                biases.get(settings.layers() - 2));
+                Utils.multiplyMatByConstantNew(learningRate, momentumBiases.get(settings.layers() - 2)), biases.get(settings.layers() - 2));
     }
 
     /**
      * Computes minibatch gradient descent
+     *
      * @param inputLayer minibatch with inputs
-     * @param label minibatch with expected outputs
+     * @param label      minibatch with expected outputs
      */
     public void layer3BackProp(int[][] inputLayer, int[][] label) {
-        double[][] dPotentials2 = initMatrix(settings.architecture[settings.layers()], settings.miniBatchSize); //edited
+        double[][] dPotentials2 = new double[settings.architecture[settings.layers()]][settings.miniBatchSize]; //edited
         Utils.subtractMats(activations.get(settings.layers() - 1), label, dPotentials2);
 
-        double[][] dWeights2 = initMatrix(settings.architecture[settings.layers()],
-                settings.architecture[settings.layers()-1]);
+        double[][] dWeights2 = new double[settings.architecture[settings.layers()]][settings.architecture[settings.layers() - 1]];
         Utils.matrixMultiplication(dPotentials2, Utils.transposeMat(activations.get(settings.layers() - 2)), dWeights2);
-        dWeights2 = Utils.multiplyMatByConstantNew(1d/settings.miniBatchSize, dWeights2);
+        dWeights2 = Utils.multiplyMatByConstantNew(1d / settings.miniBatchSize, dWeights2);
 
-        double[][] dBiases2 = initMatrix(settings.architecture[settings.layers()], 1);
+        double[][] dBiases2 = new double[settings.architecture[settings.layers()]][1];
         Utils.meanColumn(dPotentials2, dBiases2);
 
-        //edited second arg
-        double[][] dPotentials1 = initMatrix(settings.architecture[settings.layers()-1], settings.miniBatchSize);
-        Utils.matrixMultiplication(Utils.transposeMat(weights.get(settings.layers()-1)), dPotentials2, dPotentials1);
-        Utils.elementWiseMultiplication(dPotentials1, Utils.sigmoidDerivative(activations.get(settings.layers()-2)));
+        double[][] dPotentials1 = new double[settings.architecture[settings.layers() - 1]][settings.miniBatchSize];    //edited second arg
+        Utils.matrixMultiplication(Utils.transposeMat(weights.get(settings.layers() - 1)), dPotentials2, dPotentials1);
+        Utils.elementWiseMultiplication(dPotentials1, Utils.sigmoidDerivative(activations.get(settings.layers() - 2)));
 
-        double[][] dWeights1 = initMatrix(settings.architecture[settings.layers()-1],
-                settings.architecture[settings.layers()-2]);
+        double[][] dWeights1 = new double[settings.architecture[settings.layers() - 1]][settings.architecture[settings.layers() - 2]];
         Utils.matrixMultiplication(dPotentials1, Utils.transposeMat(inputLayer), dWeights1);
-        dWeights1 = Utils.multiplyMatByConstantNew(1d/settings.miniBatchSize, dWeights1);
+        dWeights1 = Utils.multiplyMatByConstantNew(1d / settings.miniBatchSize, dWeights1);
 
-        double[][] dBiases1 = initMatrix(settings.architecture[settings.layers() - 1], 1);
+        double[][] dBiases1 = new double[settings.architecture[settings.layers() - 1]][1];
         Utils.meanColumn(dPotentials1, dBiases1);
 
         //update weights and biases
         Utils.subtractMats(weights.get(settings.layers() - 2),
-                Utils.multiplyMatByConstantNew(settings.learningRate, dWeights1), weights.get(settings.layers() - 2));
+                Utils.multiplyMatByConstantNew(learningRate, dWeights1), weights.get(settings.layers() - 2));
         Utils.subtractMats(biases.get(settings.layers() - 2),
-                Utils.multiplyMatByConstantNew(settings.learningRate, dBiases1), biases.get(settings.layers() - 2));
+                Utils.multiplyMatByConstantNew(learningRate, dBiases1), biases.get(settings.layers() - 2));
 
         Utils.subtractMats(weights.get(settings.layers() - 1),
-                Utils.multiplyMatByConstantNew(settings.learningRate, dWeights2), weights.get(settings.layers() - 1));
+                Utils.multiplyMatByConstantNew(learningRate, dWeights2), weights.get(settings.layers() - 1));
         Utils.subtractMats(biases.get(settings.layers() - 1),
-                Utils.multiplyMatByConstantNew(settings.learningRate, dBiases2), biases.get(settings.layers() - 1));
+                Utils.multiplyMatByConstantNew(learningRate, dBiases2), biases.get(settings.layers() - 1));
     }
 
     public void verbosePrint() {
-        StringBuilder msg=new StringBuilder("");
+        StringBuilder msg = new StringBuilder();
         for (int i = 0; i < settings.layers(); i++) {
-            msg.append("Layer " + (i+1) + ":\n");
+            msg.append("Layer " + (i + 1) + ":\n");
             msg.append("Weights: " + Arrays.deepToString(weights.get(i)) + "\n");
             msg.append("Biases: " + Arrays.deepToString(biases.get(i)) + "\n");
             msg.append("Potentials: " + Arrays.deepToString(potentials.get(i)) + "\n");
@@ -201,12 +193,12 @@ public class MLP {
         log.info(msg.toString());
     }
 
-    public void evaluateAndBackProp(int[][] batch, int[][] label) {
-        evaluate(batch);
-        momentumLayer3BackProp(batch, label);
+    public void setLearningRate(double learningRate) {
+        this.learningRate = learningRate;
     }
 
-    public Settings getSettings() {
-        return settings;
+    public List<double[][]> getActivations() {
+        return activations;
     }
+
 }
