@@ -3,7 +3,6 @@ package cz.muni.fi.pv021.utils;
 import java.util.Random;
 import java.util.function.UnaryOperator;
 import java.util.stream.IntStream;
-import java.util.stream.LongStream;
 
 /**
  * This class contains
@@ -239,16 +238,28 @@ public class Utils {
 
         int rows1 = mat1.length;
         int cols2 = mat2[0].length;
-
-        StreamBuilder.rangeInt(0, rows1).forEach(i ->
-                StreamBuilder.rangeInt(0, cols2).forEach(j -> {
-                    mat[i][j] = 0;
-                    // this cannot be initialized via builder because it has to be sequential so waiting/deadlock
-                    // would not occur
-                    IntStream.range(0, cols1).forEach(k -> {
-                        mat[i][j] += (mat1[i][k] * mat2[k][j]);
+        StreamBuilder.forkJoinFor(IntStream::forEach, i -> {
+                    StreamBuilder.rangeInt(0, cols2).forEach(j -> {
+                        mat[i][j] = 0;
+                        // this cannot be initialized via builder because it has to be sequential so waiting/deadlock
+                        // would not occur
+                        IntStream.range(0, cols1).forEach(k -> {
+                            mat[i][j] += (mat1[i][k] * mat2[k][j]);
+                        });
                     });
-                }));
+                }
+        ).apply(StreamBuilder.rangeInt(0, rows1));
+        /*
+        StreamBuilder.rangeInt(0, rows1).forEach(i ->
+            StreamBuilder.rangeInt(0, cols2).forEach(j -> {
+                mat[i][j] = 0;
+                // this cannot be initialized via builder because it has to be sequential so waiting/deadlock
+                // would not occur
+                IntStream.range(0, cols1).forEach(k -> {
+                    mat[i][j] += (mat1[i][k] * mat2[k][j]);
+                });
+            }));
+         */
     }
 
     public static void matrixMultiplication(double[][] mat1, int[][] mat2, double[][] mat) {

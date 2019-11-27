@@ -48,6 +48,12 @@ public class Settings {
                     case "parallelStreams":
                         this.parallelStreams = Boolean.parseBoolean(a.replace(argNameFull,""));
                         break;
+                    case "useForkJoin":
+                        this.useForkJoin = Boolean.parseBoolean(a.replace(argNameFull,""));
+                        break;
+                    case "useForkJoinParallelism":
+                        this.useForkJoinParallelism = Integer.parseInt(a.replace(argNameFull,""));
+                        break;
                     case "resourcesDir":
                         this.resourcesDir = a.replace(argNameFull,"");
                         break;
@@ -122,6 +128,11 @@ public class Settings {
 
     public static boolean parallelStreams = false;
 
+    public static boolean useForkJoin = true;
+
+    //  best was to use parallelism=[4..8..16] larger or lesser has worse performance
+    public static int useForkJoinParallelism = 16;
+
     public static String resourcesDir = "./MNIST_DATA/";
 
     // results a.k.a answers
@@ -149,7 +160,6 @@ public class Settings {
 
     public static int testSetLength = 10000;
 
-
     public void printSettings(){
         StringBuilder msg = new StringBuilder("");
         msg.append("architecture: " + architecture + "\n");
@@ -158,6 +168,8 @@ public class Settings {
         msg.append("momentum: " + momentum + "\n");
         msg.append("epochs: " + epochs + "\n");
         msg.append("parallelStreams: " + parallelStreams + "\n");
+        msg.append("useForkJoin: " + useForkJoin + "\n");
+        msg.append("useForkJoinParallelism: " + useForkJoinParallelism + "\n");
         msg.append("resourcesDir: " + resourcesDir + "\n");
         msg.append("seed: " + seed + "\n");
         msg.append("answers: " + answers + "\n");
